@@ -1,0 +1,11 @@
+# OS specific
+.DS_Store
+.DS_Store?
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+env/
+.env/
