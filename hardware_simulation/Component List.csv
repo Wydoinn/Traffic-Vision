@@ -1,0 +1,5 @@
+﻿Name,Quantity,Component
+"U1, U2, U3",3," Arduino Uno R3"
+"PING1, PING2, PING3, PING4, PING5, PING6, PING7, PING8",8," Ultrasonic Distance Sensor"
+"D1, D2, D3, D4, D5, D6, D7, D8",8,"RCBG LED RGB"
+"R1, R2, R3, R4, R5, R6, R7, R8",8,"500 Ω Resistor"
