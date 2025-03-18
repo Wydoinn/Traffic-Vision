@@ -1,5 +1,6 @@
 import sqlite3
 import threading
+import os
 from datetime import datetime, timezone
 from typing import Dict, List, Any
 
@@ -21,6 +22,11 @@ class TrafficDatabase:
     def connect(self):
         """Establish connection to the SQLite database - creates a thread-local connection."""
         try:
+            # Ensure the directory exists
+            db_dir = os.path.dirname(self.db_path)
+            if db_dir and not os.path.exists(db_dir):
+                os.makedirs(db_dir, exist_ok=True)
+
             # Create a new connection for this thread if one doesn't exist
             if not hasattr(self.local, 'conn') or self.local.conn is None:
                 self.local.conn = sqlite3.connect(self.db_path)
@@ -28,6 +34,9 @@ class TrafficDatabase:
                 self.local.cursor = self.local.conn.cursor()
         except sqlite3.Error as e:
             print(f"Database connection error: {e}")
+            raise
+        except OSError as e:
+            print(f"OS error when creating database directory: {e}")
             raise
 
     def ensure_connection(self):
