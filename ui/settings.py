@@ -374,7 +374,6 @@ class SettingsTab(QScrollArea):
         if restart_msg.exec() == QMessageBox.StandardButton.Yes:
             self.main_window.restart_application()
         else:
-            # Just apply what we can without restart
             self.main_window.apply_settings_to_models()
             QMessageBox.information(self, "Settings Saved", "Settings saved successfully. Some changes may require restarting the application to take full effect.")
             self.main_window.status_bar.showMessage("Settings saved", 3000)
