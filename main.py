@@ -14,7 +14,7 @@ from PyQt6.QtCore import Qt
 from inference import InferenceThread
 from manager import ZoneManager
 from utils.constants import *
-from static.styles.styles import get_stylesheet, is_system_dark_theme
+from static.styles.styles import get_stylesheet
 from ui.controls import ControlPanel
 from ui.settings import SettingsTab
 from ui.monitoring import MonitoringTab
@@ -62,7 +62,7 @@ class ZoneManagerGUI(QMainWindow):
 
     def setup_ui(self):
         """Sets up the user interface of the application."""
-        self.setStyleSheet(get_stylesheet(is_system_dark_theme()))
+        self.setStyleSheet(get_stylesheet())
         central_widget = QWidget()
         main_layout = QHBoxLayout()
 
@@ -695,7 +695,7 @@ class ZoneManagerGUI(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("static/icon/traffic-light.png"))
+    app.setWindowIcon(QIcon("static/icons/traffic-light.png"))
     zone_manager_gui = ZoneManagerGUI()
     zone_manager_gui.show()
     sys.exit(app.exec())
