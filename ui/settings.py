@@ -28,14 +28,14 @@ class SettingsTab(QScrollArea):
 
         self.settings_layout.addLayout(settings_group_layout)
 
+        # Add Telegram notification settings
+        self.add_telegram_notification_settings()
+
+        # Move save settings button to bottom
         save_settings_btn = QPushButton("Save Settings")
         save_settings_btn.setToolTip("Save all settings to configuration file")
         save_settings_btn.clicked.connect(self.save_settings_gui)
         self.settings_layout.addWidget(save_settings_btn)
-        self.settings_layout.addStretch(1)
-
-        # Add Telegram notification settings
-        self.add_telegram_notification_settings()
 
     def create_model_paths_group(self):
         """Creates the model paths settings group box with support for multiple model formats."""
