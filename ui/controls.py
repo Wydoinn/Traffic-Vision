@@ -46,6 +46,7 @@ class ControlPanel(QWidget):
         self.video_path_label = QLabel("No video selected")
         select_video_btn = QPushButton("Select Video")
         select_video_btn.setIcon(QIcon.fromTheme("document-open"))
+        select_video_btn.setToolTip("Select a video file to analyze")
         select_video_btn.clicked.connect(self.main_window.select_video)
         video_selection_layout.addWidget(self.video_path_label)
         video_selection_layout.addWidget(select_video_btn)
@@ -71,6 +72,7 @@ class ControlPanel(QWidget):
         zone_spinbox.setRange(1, 10)
         zone_spinbox.setValue(1)
         zone_spinbox.setFixedWidth(120)
+        zone_spinbox.setToolTip(f"Select the number of {zone_type} zones to create")
         count_layout.addWidget(zone_spinbox)
         count_layout.addStretch()
 
@@ -82,6 +84,7 @@ class ControlPanel(QWidget):
         zone_group_layout.addWidget(zone_frame)
 
         create_button = QPushButton(create_button_text)
+        create_button.setToolTip(f"Start drawing {zone_type} zones on the video")
         create_button.clicked.connect(create_button_action)
         zone_group_layout.addWidget(create_button)
 
@@ -95,9 +98,11 @@ class ControlPanel(QWidget):
         """Creates the layout for zone save/load buttons."""
         zones_io_layout = QHBoxLayout()
         self.save_zones_btn = QPushButton("Save Zones")
+        self.save_zones_btn.setToolTip("Save the current zone configuration to a file")
         self.save_zones_btn.clicked.connect(self.main_window.save_zones)
         self.save_zones_btn.setEnabled(False)
         self.load_zones_btn = QPushButton("Load Zones")
+        self.load_zones_btn.setToolTip("Load a previously saved zone configuration")
         self.load_zones_btn.clicked.connect(self.main_window.load_zones)
         zones_io_layout.addWidget(self.save_zones_btn)
         zones_io_layout.addWidget(self.load_zones_btn)
@@ -111,6 +116,7 @@ class ControlPanel(QWidget):
         self.toggle_traffic_lights_btn = QPushButton("Show Traffic Lights")
         self.toggle_traffic_lights_btn.setCheckable(True)
         self.toggle_traffic_lights_btn.setChecked(False)
+        self.toggle_traffic_lights_btn.setToolTip("Toggle the visibility of traffic lights on the video")
         self.toggle_traffic_lights_btn.clicked.connect(self.toggle_traffic_lights)
 
         # Initially disable the traffic light button until configured
@@ -147,6 +153,7 @@ class ControlPanel(QWidget):
         inference_group = QGroupBox("Inference Control")
         inference_group_layout = QVBoxLayout()
         self.start_inference_btn = QPushButton("Start Inference")
+        self.start_inference_btn.setToolTip("Start/Stop object detection and traffic analysis")
         self.start_inference_btn.clicked.connect(self.main_window.toggle_inference)
         self.start_inference_btn.setEnabled(False)
         inference_group_layout.addWidget(self.start_inference_btn)

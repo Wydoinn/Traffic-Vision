@@ -29,6 +29,7 @@ class SettingsTab(QScrollArea):
         self.settings_layout.addLayout(settings_group_layout)
 
         save_settings_btn = QPushButton("Save Settings")
+        save_settings_btn.setToolTip("Save all settings to configuration file")
         save_settings_btn.clicked.connect(self.save_settings_gui)
         self.settings_layout.addWidget(save_settings_btn)
         self.settings_layout.addStretch(1)
@@ -44,22 +45,28 @@ class SettingsTab(QScrollArea):
 
         model_paths_grid.addWidget(QLabel("Object:"), 0, 0)
         self.zone_model_path_edit = QLineEdit(self.main_window.settings["model_paths"][MODEL_TYPE_ZONE])
+        self.zone_model_path_edit.setToolTip("Path to the object detection model used for vehicles and pedestrians")
         model_paths_grid.addWidget(self.zone_model_path_edit, 0, 1)
         zone_model_path_button = QPushButton("Browse")
+        zone_model_path_button.setToolTip("Select object detection model file")
         zone_model_path_button.clicked.connect(lambda: self.main_window.browse_model_path(self.zone_model_path_edit, MODEL_TYPE_ZONE))
         model_paths_grid.addWidget(zone_model_path_button, 0, 2)
 
         model_paths_grid.addWidget(QLabel("Emergency:"), 1, 0)
         self.emergency_model_path_edit = QLineEdit(self.main_window.settings["model_paths"][MODEL_TYPE_EMERGENCY])
+        self.emergency_model_path_edit.setToolTip("Path to the model used for emergency vehicle detection")
         model_paths_grid.addWidget(self.emergency_model_path_edit, 1, 1)
         emergency_model_path_button = QPushButton("Browse")
+        emergency_model_path_button.setToolTip("Select emergency vehicle detection model file")
         emergency_model_path_button.clicked.connect(lambda: self.main_window.browse_model_path(self.emergency_model_path_edit, MODEL_TYPE_EMERGENCY))
         model_paths_grid.addWidget(emergency_model_path_button, 1, 2)
 
         model_paths_grid.addWidget(QLabel("Accident:"), 2, 0)
         self.accident_model_path_edit = QLineEdit(self.main_window.settings["model_paths"][MODEL_TYPE_ACCIDENT])
+        self.accident_model_path_edit.setToolTip("Path to the model used for accident detection")
         model_paths_grid.addWidget(self.accident_model_path_edit, 2, 1)
         accident_model_path_button = QPushButton("Browse")
+        accident_model_path_button.setToolTip("Select accident detection model file")
         accident_model_path_button.clicked.connect(lambda: self.main_window.browse_model_path(self.accident_model_path_edit, MODEL_TYPE_ACCIDENT))
         model_paths_grid.addWidget(accident_model_path_button, 2, 2)
 
@@ -82,6 +89,7 @@ class SettingsTab(QScrollArea):
         conf_spin.setRange(0.0, 1.0)
         conf_spin.setSingleStep(0.05)
         conf_spin.setValue(model_settings.get("confidence_threshold", DEFAULT_CONFIDENCE_THRESHOLD))
+        conf_spin.setToolTip("Minimum confidence score required for a detection to be considered valid")
         settings_grid.addWidget(conf_spin, 0, 1)
 
         # Create IOU threshold setting
@@ -90,6 +98,7 @@ class SettingsTab(QScrollArea):
         iou_spin.setRange(0.0, 1.0)
         iou_spin.setSingleStep(0.05)
         iou_spin.setValue(model_settings.get("iou_threshold", DEFAULT_IOU_THRESHOLD))
+        iou_spin.setToolTip("Intersection over Union threshold for filtering overlapping detections")
         settings_grid.addWidget(iou_spin, 1, 1)
 
         # Store the spin boxes for later access
@@ -131,6 +140,7 @@ class SettingsTab(QScrollArea):
         self.imgsz_spin.setRange(320, 1920)
         self.imgsz_spin.setSingleStep(32)
         self.imgsz_spin.setValue(self.main_window.settings["inference_settings"]["imgsz"])
+        self.imgsz_spin.setToolTip("Input image size for the model (larger = more accurate but slower)")
         common_inference_settings_grid.addWidget(self.imgsz_spin, row_idx, 1)
         row_idx += 1
 
@@ -139,12 +149,14 @@ class SettingsTab(QScrollArea):
         self.max_det_spin.setRange(1, 1000)
         self.max_det_spin.setSingleStep(50)
         self.max_det_spin.setValue(self.main_window.settings["inference_settings"]["max_det"])
+        self.max_det_spin.setToolTip("Maximum number of detections per frame")
         common_inference_settings_grid.addWidget(self.max_det_spin, row_idx, 1)
         row_idx += 1
 
         common_inference_settings_grid.addWidget(QLabel("Video Stride:"), row_idx, 0)
         self.vid_stride_spin = QSpinBox()
         self.vid_stride_spin.setRange(1, 10)
+        self.vid_stride_spin.setToolTip("Process every nth frame (higher values improve performance but reduce accuracy)")
 
         # Ensure a valid default value
         vid_stride = self.main_window.settings["inference_settings"].get("vid_stride", DEFAULT_VIDEO_STRIDE)
@@ -160,6 +172,7 @@ class SettingsTab(QScrollArea):
         common_inference_settings_grid.addWidget(QLabel("Half Precision:"), row_idx, 0)
         self.half_check = QCheckBox()
         self.half_check.setChecked(self.main_window.settings["inference_settings"]["half"])
+        self.half_check.setToolTip("Use half-precision floating point (FP16) for faster inference")
         common_inference_settings_grid.addWidget(self.half_check, row_idx, 1)
         common_inference_settings_grid.setRowMinimumHeight(row_idx, 30)
         row_idx += 1
@@ -167,6 +180,7 @@ class SettingsTab(QScrollArea):
         common_inference_settings_grid.addWidget(QLabel("Agnostic NMS:"), row_idx, 0)
         self.agnostic_nms_check = QCheckBox()
         self.agnostic_nms_check.setChecked(self.main_window.settings["inference_settings"]["agnostic_nms"])
+        self.agnostic_nms_check.setToolTip("Class-agnostic NMS for better multi-class detection")
         common_inference_settings_grid.addWidget(self.agnostic_nms_check, row_idx, 1)
         common_inference_settings_grid.setRowMinimumHeight(row_idx, 30)
         row_idx += 1
@@ -174,6 +188,7 @@ class SettingsTab(QScrollArea):
         common_inference_settings_grid.addWidget(QLabel("Stream Buffer:"), row_idx, 0)
         self.stream_buffer_check = QCheckBox()
         self.stream_buffer_check.setChecked(self.main_window.settings["inference_settings"]["stream_buffer"])
+        self.stream_buffer_check.setToolTip("Buffer frames for smoother video playback")
         common_inference_settings_grid.addWidget(self.stream_buffer_check, row_idx, 1)
         common_inference_settings_grid.setRowMinimumHeight(row_idx, 30)
         row_idx += 1
@@ -189,6 +204,7 @@ class SettingsTab(QScrollArea):
         self.heatmap_sigma_spin = QSpinBox()
         self.heatmap_sigma_spin.setRange(1, 200)
         self.heatmap_sigma_spin.setValue(self.main_window.settings["heatmap_settings"]["kernel_sigma"])
+        self.heatmap_sigma_spin.setToolTip("Gaussian kernel size for heatmap smoothing (larger = more blur)")
         heatmap_settings_grid.addWidget(self.heatmap_sigma_spin, 0, 1)
 
         heatmap_settings_grid.addWidget(QLabel("Intensity Factor:"), 1, 0)
@@ -196,6 +212,7 @@ class SettingsTab(QScrollArea):
         self.heatmap_intensity_spin.setRange(0.0, 1.0)
         self.heatmap_intensity_spin.setSingleStep(0.05)
         self.heatmap_intensity_spin.setValue(self.main_window.settings["heatmap_settings"]["intensity_factor"])
+        self.heatmap_intensity_spin.setToolTip("Intensity multiplier for heatmap visualization")
         heatmap_settings_grid.addWidget(self.heatmap_intensity_spin, 1, 1)
 
         heatmap_settings_grid.addWidget(QLabel("Opacity:"), 2, 0)
@@ -203,6 +220,7 @@ class SettingsTab(QScrollArea):
         self.heatmap_opacity_spin.setRange(0.0, 1.0)
         self.heatmap_opacity_spin.setSingleStep(0.05)
         self.heatmap_opacity_spin.setValue(self.main_window.settings["heatmap_settings"]["heatmap_opacity"])
+        self.heatmap_opacity_spin.setToolTip("Opacity of the heatmap overlay (0 = transparent, 1 = opaque)")
         heatmap_settings_grid.addWidget(self.heatmap_opacity_spin, 2, 1)
 
         heatmap_settings_grid.addWidget(QLabel("Heatmap Decay:"), 3, 0)
@@ -210,12 +228,14 @@ class SettingsTab(QScrollArea):
         self.heatmap_decay_spin.setRange(0.0, 1.0)
         self.heatmap_decay_spin.setSingleStep(0.05)
         self.heatmap_decay_spin.setValue(self.main_window.settings["heatmap_settings"]["heatmap_decay"])
+        self.heatmap_decay_spin.setToolTip("Rate at which heatmap points fade over time")
         heatmap_settings_grid.addWidget(self.heatmap_decay_spin, 3, 1)
 
         heatmap_settings_grid.addWidget(QLabel("Colormap:"), 4, 0)
         self.colormap_combo = QComboBox()
         self.colormap_combo.addItems(AVAILABLE_COLORMAPS)
         self.colormap_combo.setCurrentText(self.main_window.settings["heatmap_settings"]["colormap"])
+        self.colormap_combo.setToolTip("Color scheme used for the heatmap visualization")
         heatmap_settings_grid.addWidget(self.colormap_combo, 4, 1)
         return heatmap_settings_group
 
@@ -239,6 +259,7 @@ class SettingsTab(QScrollArea):
 
         # Enabled checkbox
         self.telegram_enabled = QCheckBox("Enable Telegram Notifications")
+        self.telegram_enabled.setToolTip("Enable/Disable sending notifications via Telegram bot")
         telegram_enabled_value = self.main_window.settings.get("telegram_settings", {}).get(
             TELEGRAM_ENABLED_KEY, TELEGRAM_ENABLED_DEFAULT)
         self.telegram_enabled.setChecked(telegram_enabled_value)
@@ -249,6 +270,7 @@ class SettingsTab(QScrollArea):
         self.telegram_api_token = QLineEdit()
         self.telegram_api_token.setEchoMode(QLineEdit.EchoMode.Password)
         self.telegram_api_token.setPlaceholderText("Enter Telegram Bot API Token")
+        self.telegram_api_token.setToolTip("Bot API token obtained from @BotFather")
         telegram_api_token_value = self.main_window.settings.get("telegram_settings", {}).get(
             TELEGRAM_API_TOKEN_KEY, TELEGRAM_API_TOKEN_DEFAULT)
         self.telegram_api_token.setText(telegram_api_token_value)
@@ -260,6 +282,7 @@ class SettingsTab(QScrollArea):
         chat_id_label = QLabel("Chat ID:")
         self.telegram_chat_id = QLineEdit()
         self.telegram_chat_id.setPlaceholderText("Enter Telegram Chat ID")
+        self.telegram_chat_id.setToolTip("Chat ID where notifications will be sent")
         telegram_chat_id_value = self.main_window.settings.get("telegram_settings", {}).get(
             TELEGRAM_CHAT_ID_KEY, TELEGRAM_CHAT_ID_DEFAULT)
         self.telegram_chat_id.setText(telegram_chat_id_value)
@@ -268,6 +291,7 @@ class SettingsTab(QScrollArea):
 
         # Test notification button
         self.test_notification_btn = QPushButton("Test Notification")
+        self.test_notification_btn.setToolTip("Send a test notification to verify configuration")
         self.test_notification_btn.clicked.connect(self.test_telegram_notification)
 
         # Help text
@@ -374,6 +398,7 @@ class SettingsTab(QScrollArea):
         if restart_msg.exec() == QMessageBox.StandardButton.Yes:
             self.main_window.restart_application()
         else:
+            # Just apply what we can without restart
             self.main_window.apply_settings_to_models()
             QMessageBox.information(self, "Settings Saved", "Settings saved successfully. Some changes may require restarting the application to take full effect.")
             self.main_window.status_bar.showMessage("Settings saved", 3000)

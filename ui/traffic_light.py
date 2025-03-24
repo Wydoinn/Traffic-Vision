@@ -122,40 +122,48 @@ class AddTrafficLightDialog(QDialog):
 
         # ID field
         self.id_edit = QLineEdit()
+        self.id_edit.setToolTip("Enter a unique identifier for the traffic light")
         form_layout.addRow("Light ID:", self.id_edit)
 
         # Name field
         self.name_edit = QLineEdit()
+        self.name_edit.setToolTip("Enter a display name for the traffic light")
         form_layout.addRow("Display Name:", self.name_edit)
 
         # Zone selection
         self.zone_combo = QComboBox()
+        self.zone_combo.setToolTip("Select the traffic zone this light will control")
         self.zone_combo.addItems(self.zone_names)
         form_layout.addRow("Traffic Zone:", self.zone_combo)
 
         # Timing fields
         self.min_green_spin = QSpinBox()
+        self.min_green_spin.setToolTip("Minimum duration of green light in seconds")
         self.min_green_spin.setRange(5, 30)
         self.min_green_spin.setValue(16)
         form_layout.addRow("Min Green Time (s):", self.min_green_spin)
 
         self.max_green_spin = QSpinBox()
+        self.max_green_spin.setToolTip("Maximum duration of green light in seconds")
         self.max_green_spin.setRange(15, 120)
         self.max_green_spin.setValue(60)
         form_layout.addRow("Max Green Time (s):", self.max_green_spin)
 
         self.yellow_spin = QSpinBox()
+        self.yellow_spin.setToolTip("Duration of yellow light in seconds")
         self.yellow_spin.setRange(2, 5)
         self.yellow_spin.setValue(3)
         form_layout.addRow("Yellow Duration (s):", self.yellow_spin)
 
         # Add pedestrian timing settings
         self.ped_min_spin = QSpinBox()
+        self.ped_min_spin.setToolTip("Minimum duration of pedestrian crossing phase in seconds")
         self.ped_min_spin.setRange(5, 20)
         self.ped_min_spin.setValue(10)
         form_layout.addRow("Min Pedestrian Time (s):", self.ped_min_spin)
 
         self.ped_max_spin = QSpinBox()
+        self.ped_max_spin.setToolTip("Maximum duration of pedestrian crossing phase in seconds")
         self.ped_max_spin.setRange(15, 45)
         self.ped_max_spin.setValue(30)
         form_layout.addRow("Max Pedestrian Time (s):", self.ped_max_spin)
@@ -167,6 +175,7 @@ class AddTrafficLightDialog(QDialog):
         layout.addWidget(self.position_label)
 
         self.select_position_btn = QPushButton("Select Position on Video")
+        self.select_position_btn.setToolTip("Click to place the traffic light on the video frame")
         self.select_position_btn.clicked.connect(self.select_position)
         layout.addWidget(self.select_position_btn)
 
@@ -372,9 +381,11 @@ class TrafficLightConfigTab(QWidget):
         control_layout = QHBoxLayout()
 
         self.save_config_btn = QPushButton("Save Configuration")
+        self.save_config_btn.setToolTip("Save the current traffic light configuration to a file")
         self.save_config_btn.clicked.connect(self.save_configuration)
 
         self.load_config_btn = QPushButton("Load Configuration")
+        self.load_config_btn.setToolTip("Load a previously saved traffic light configuration")
         self.load_config_btn.clicked.connect(self.load_configuration)
 
         control_layout.addWidget(self.save_config_btn)
@@ -400,9 +411,11 @@ class TrafficLightConfigTab(QWidget):
         # Add/Remove light buttons
         light_buttons_layout = QHBoxLayout()
         self.add_light_btn = QPushButton("Add Light")
+        self.add_light_btn.setToolTip("Add a new traffic light to the configuration")
         self.add_light_btn.clicked.connect(self.add_traffic_light)
 
         self.remove_light_btn = QPushButton("Remove Light")
+        self.remove_light_btn.setToolTip("Remove the selected traffic light")
         self.remove_light_btn.clicked.connect(self.remove_traffic_light)
 
         light_buttons_layout.addWidget(self.add_light_btn)
@@ -430,9 +443,11 @@ class TrafficLightConfigTab(QWidget):
         # Add/Remove intersection buttons
         intersection_buttons_layout = QHBoxLayout()
         self.add_intersection_btn = QPushButton("Add Intersection")
+        self.add_intersection_btn.setToolTip("Create a new intersection by grouping traffic lights")
         self.add_intersection_btn.clicked.connect(self.add_intersection)
 
         self.remove_intersection_btn = QPushButton("Remove Intersection")
+        self.remove_intersection_btn.setToolTip("Remove the selected intersection")
         self.remove_intersection_btn.clicked.connect(self.remove_intersection)
 
         intersection_buttons_layout.addWidget(self.add_intersection_btn)
@@ -444,6 +459,7 @@ class TrafficLightConfigTab(QWidget):
 
         # Add adaptive mode button in center at the bottom
         self.adaptive_btn = QPushButton("Adaptive Mode: ON")
+        self.adaptive_btn.setToolTip("Toggle between adaptive timing based on traffic conditions and fixed timing")
         self.adaptive_btn.setCheckable(True)
         self.adaptive_btn.setChecked(True)
         self.adaptive_btn.clicked.connect(self.toggle_adaptive_mode)
