@@ -1,5 +1,5 @@
 def get_stylesheet() -> str:
-    """Returns the updated stylesheet for the application with QComboBox arrow styling."""
+    """Returns the updated stylesheet for the application with comprehensive light theme styling."""
     return """
         QMainWindow {
             background-color: #fcfaf8;
@@ -180,5 +180,109 @@ def get_stylesheet() -> str:
         }
         QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
             background: none;
+        }
+
+        QMessageBox, QDialog {
+            background-color: #fcfaf8;
+            color: #4a3c31;
+        }
+
+        QMessageBox QLabel, QDialog QLabel {
+            color: #4a3c31;
+            font-size: 12px;
+            padding: 10px;
+        }
+
+        QMessageBox QPushButton, QDialog QPushButton {
+            min-width: 80px;
+            min-height: 25px;
+            padding: 5px 15px;
+        }
+
+        QTableWidget {
+            background-color: #ffffff;
+            alternate-background-color: #faf6f1;
+            color: #4a3c31;
+            gridline-color: #e8e2d9;
+            selection-background-color: #6B8CEF;
+            selection-color: white;
+            border: 1px solid #e8e2d9;
+            border-radius: 8px;
+        }
+
+        QTableWidget::item {
+            padding: 5px;
+            border-bottom: 1px solid #e8e2d9;
+        }
+
+        QTableWidget::item:selected {
+            background-color: #6B8CEF;
+            color: white;
+        }
+
+        QHeaderView::section {
+            background-color: #f5f1ea;
+            color: #4a3c31;
+            padding: 5px;
+            border: none;
+            border-right: 1px solid #e8e2d9;
+            border-bottom: 1px solid #e8e2d9;
+            font-weight: bold;
+        }
+
+        QCheckBox {
+            color: #4a3c31;
+            spacing: 5px;
+        }
+
+        QCheckBox::indicator {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #e8e2d9;
+            border-radius: 4px;
+            background-color: #ffffff;
+        }
+
+        QCheckBox::indicator:checked {
+            background-color: #6B8CEF;
+            border-color: #6B8CEF;
+            image: url(static/icons/checkmark.png);
+        }
+
+        QCheckBox::indicator:hover {
+            border-color: #6B8CEF;
+        }
+
+        QFormLayout {
+            spacing: 12px;
+        }
+
+        QStatusBar {
+            background-color: #fcfaf8;
+            color: #4a3c31;
+            border-top: 1px solid #e8e2d9;
+        }
+
+        QStatusBar QLabel {
+            padding: 3px;
+            font-size: 11px;
+        }
+
+        QDialogButtonBox {
+            button-layout: 2;
+        }
+
+        QDialogButtonBox QPushButton {
+            min-width: 80px;
+            min-height: 25px;
+            padding: 5px 15px;
+        }
+
+        QToolTip {
+            background-color: #ffffff;
+            color: #4a3c31;
+            border: 1px solid #e8e2d9;
+            border-radius: 4px;
+            padding: 5px;
         }
     """
