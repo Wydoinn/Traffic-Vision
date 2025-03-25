@@ -23,13 +23,13 @@ from db.data_collector import TrafficDataCollector
 
 class ZoneManagerGUI(QMainWindow):
     """
-    Main application window for the Traffic Management System.
+    Main application window for the Traffic Vision.
     Handles GUI interactions, settings, and video processing.
     Includes separate vehicle and pedestrian zones.
     """
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Traffic Management System")
+        self.setWindowTitle("Traffic Vision")
 
         # Initialize the data collector
         self.data_collector = TrafficDataCollector()
