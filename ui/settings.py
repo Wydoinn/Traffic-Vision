@@ -332,7 +332,7 @@ class SettingsTab(QScrollArea):
         success = notifier.send_accident_notification(
             image=None,
             location="Test Location",
-            details="This is a test notification from Traffic Management System."
+            details="This is a test notification from Traffic Vision."
         )
 
         if success:
