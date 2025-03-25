@@ -1,4 +1,3 @@
-# monitoring.py
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QGroupBox, QGridLayout,
                              QLabel, QFrame, QScrollArea)
 from typing import Dict
