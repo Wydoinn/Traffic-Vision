@@ -162,7 +162,3 @@ Pull requests are welcome. For significant changes, please open an issue first t
 
 ## 📜 **License**
 This project is licensed under the MIT License.
-
----
-
-✅ Let me know if you need any modifications or additional sections! 🚀
