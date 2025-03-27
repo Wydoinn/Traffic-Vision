@@ -50,8 +50,8 @@ class ZoneManager:
         # Add accident notification attributes
         self.telegram_notifier = None
         self.last_accident_notification_time = 0
-        self.accident_notification_cooldown = 30  # seconds between notifications
-        self.accident_frames = []  # To track frames with accidents for notification
+        self.accident_notification_cooldown = 30
+        self.accident_frames = []
 
         # Speed estimation attributes
         self.track_history = {}
@@ -226,11 +226,9 @@ class ZoneManager:
             resized_frame, zone_detections, emergency_detections,
             accident_detections, vehicle_speeds, emergency_speeds)
 
-        # Update traffic lights
         if self.traffic_light_controller:
             self._update_traffic_light_system(annotated_frame)
 
-        # Update counts
         self.update_counts(zone_detections)
 
         # Check for accident and send notification if necessary
@@ -240,7 +238,6 @@ class ZoneManager:
 
         # Handle accident notifications
         if self.accident_detected:
-            # Track accident frames for notification
             if len(self.accident_frames) < 5:
                 self.accident_frames.append(annotated_frame.copy())
             else:
@@ -252,7 +249,6 @@ class ZoneManager:
                 (current_time - self.last_accident_notification_time > self.accident_notification_cooldown)):
                 self._send_accident_notification(annotated_frame)
         else:
-            # Clear accident frames if no accident is detected
             self.accident_frames.clear()
 
         return annotated_frame, heatmap_frame
@@ -458,7 +454,6 @@ class ZoneManager:
             # No accident detected, clear accident state
             self.traffic_light_controller.report_accident(False)
 
-        # Update light phases
         self.traffic_light_controller.update_all_lights()
 
         # Visualize traffic lights if enabled
@@ -468,7 +463,6 @@ class ZoneManager:
 
     def get_common_inference_params(self) -> Dict:
         """Returns common inference parameters from settings."""
-        # Ensure we're accessing the correct inference settings
         if not self.inference_settings:
             print("Warning: inference_settings is None. Using defaults.")
             return {
@@ -492,7 +486,6 @@ class ZoneManager:
         if model is None:
             return None
 
-        # Default values if settings are missing
         default_model_settings = {
             "confidence_threshold": DEFAULT_CONFIDENCE_THRESHOLD,
             "iou_threshold": DEFAULT_IOU_THRESHOLD
@@ -503,7 +496,6 @@ class ZoneManager:
                           if isinstance(self.inference_settings, dict)
                           else default_model_settings)
 
-        # Extract parameters with defaults
         conf = model_settings.get("confidence_threshold", DEFAULT_CONFIDENCE_THRESHOLD)
         iou = model_settings.get("iou_threshold", DEFAULT_IOU_THRESHOLD)
 
@@ -574,7 +566,6 @@ class ZoneManager:
 
     def _get_gaussian_kernel(self, sigma):
         """Cache and retrieve gaussian kernels for better performance."""
-        # Round sigma to nearest 0.5 to improve cache hits
         sigma_key = round(sigma * 2) / 2
 
         if sigma_key not in self.gaussian_kernels:
