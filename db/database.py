@@ -19,13 +19,22 @@ class TrafficDatabase:
         self.connect()
         self.create_tables()
 
+    def ensure_db_directory(self):
+        """Make sure the directory for the database file exists."""
+        db_dir = os.path.dirname(self.db_path)
+        if db_dir and not os.path.exists(db_dir):
+            try:
+                os.makedirs(db_dir)
+                print(f"Created directory: {db_dir}")
+            except OSError as e:
+                print(f"Error creating directory {db_dir}: {e}")
+                raise
+
     def connect(self):
         """Establish connection to the SQLite database - creates a thread-local connection."""
         try:
-            # Ensure the directory exists
-            db_dir = os.path.dirname(self.db_path)
-            if db_dir and not os.path.exists(db_dir):
-                os.makedirs(db_dir, exist_ok=True)
+            # Ensure directory exists before connecting
+            self.ensure_db_directory()
 
             # Create a new connection for this thread if one doesn't exist
             if not hasattr(self.local, 'conn') or self.local.conn is None:
@@ -34,9 +43,6 @@ class TrafficDatabase:
                 self.local.cursor = self.local.conn.cursor()
         except sqlite3.Error as e:
             print(f"Database connection error: {e}")
-            raise
-        except OSError as e:
-            print(f"OS error when creating database directory: {e}")
             raise
 
     def ensure_connection(self):
