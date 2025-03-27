@@ -82,7 +82,6 @@ class MonitoringTab(QWidget):
 
     def update_zone_vehicle_counts(self, zone_counts: Dict[str, Dict[str, int]]):
         """Updates statistics for vehicle zones, showing all zones even if empty."""
-        # Clear previous widgets
         self.clear_layout(self.vehicle_zones_layout)
 
         if not zone_counts:
@@ -111,7 +110,6 @@ class MonitoringTab(QWidget):
 
     def update_zone_pedestrian_counts(self, zone_counts: Dict[str, int]):
         """Updates statistics for pedestrian zones, showing all zones even if empty."""
-        # Clear previous widgets
         self.clear_layout(self.pedestrian_zones_layout)
 
         if not zone_counts:
@@ -237,7 +235,6 @@ class MonitoringTab(QWidget):
             intersection_layout.addWidget(accident_label, row_offset, 0, 1, 3)
             row_offset += 1
 
-        # Handle pedestrian phase indicator
         if data.get('is_pedestrian_phase', False):
             ped_label = QLabel("PEDESTRIAN CROSSING ACTIVE")
             ped_label.setStyleSheet("font-weight: bold; color: blue;")

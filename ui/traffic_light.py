@@ -49,13 +49,11 @@ class TrafficLightPositionSelector:
 
         cv2.imshow(window_name, display_frame)
 
-        # Store clicked position
         self.selected_position = None
 
         def mouse_callback(event, x, y, flags, param):
             """Handle mouse events for position selection."""
             if event == cv2.EVENT_LBUTTONDOWN:
-                # Create a copy of the original frame
                 temp_frame = resized_frame.copy()
 
                 # Draw marker at selected position
@@ -83,7 +81,6 @@ class TrafficLightPositionSelector:
             elif key == 13:  # Enter key
                 break
 
-            # Check if window still exists, break if it's been closed
             try:
                 if cv2.getWindowProperty(window_name, cv2.WND_PROP_VISIBLE) < 1:
                     break
@@ -92,7 +89,6 @@ class TrafficLightPositionSelector:
 
         cv2.destroyAllWindows()
 
-        # Additional cleanup to ensure window is closed
         for i in range(5):
             cv2.waitKey(1)
 
@@ -109,7 +105,6 @@ class TrafficLightPositionSelector:
 
 class AddTrafficLightDialog(QDialog):
     """Dialog for adding a new traffic light."""
-
     def __init__(self, parent=None, zone_names=None):
         super().__init__(parent)
         self.setWindowTitle("Add Traffic Light")
@@ -189,8 +184,6 @@ class AddTrafficLightDialog(QDialog):
         layout.addWidget(button_box)
 
         self.setLayout(layout)
-
-        # Initialize position
         self.position = (0, 0)
 
     def select_position(self):
@@ -198,27 +191,19 @@ class AddTrafficLightDialog(QDialog):
         if not self._validate_prerequisites():
             return
 
-        # Prepare UI state for position selection
         ui_state = self._prepare_ui_state()
-
-        # Get main window reference
         main_window = self.parent.parent
 
-        # Initialize position selector
         self.position_selector = TrafficLightPositionSelector(
             main_window.video_path,
             main_window.zone_manager.frame_width,
             main_window.zone_manager.frame_height
         )
 
-        # Select position interactively
         light_name = self.name_edit.text() or "Traffic Light"
         position = self.position_selector.select_position(light_name)
 
-        # Restore UI state
         self._restore_ui_state(ui_state)
-
-        # Handle selection result
         self._handle_position_result(position)
 
     def _validate_prerequisites(self):
@@ -471,11 +456,7 @@ class TrafficLightConfigTab(QWidget):
         layout.addLayout(adaptive_layout)
 
         self.setLayout(layout)
-
-        # Initial table update
         self.update_tables()
-
-        # Initially disable buttons until there's something to control/save
         self._update_button_states()
 
     def _configure_table(self, table, fixed_height, column_widths):
@@ -518,7 +499,6 @@ class TrafficLightConfigTab(QWidget):
 
     def add_traffic_light(self):
         """Open dialog to add a new traffic light."""
-        # Get available zone names from parent
         zone_names = []
         if hasattr(self.parent, 'zone_manager') and self.parent.zone_manager:
             vehicle_zones = list(self.parent.zone_manager.zones.get('vehicle', {}).keys())
@@ -607,12 +587,10 @@ class TrafficLightConfigTab(QWidget):
             QMessageBox.warning(self, "Warning", "No intersection selected.")
             return
 
-        # Get the intersection ID from the first column of the selected row
         intersection_id = self.intersections_table.item(selected_rows[0].row(), 0).text()
 
         # Remove the intersection
         if intersection_id in self.traffic_controller.intersections:
-            # Also cleanup related data structures
             if intersection_id in self.traffic_controller.active_phase:
                 del self.traffic_controller.active_phase[intersection_id]
             if intersection_id in self.traffic_controller.phase_start_time:
