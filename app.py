@@ -143,6 +143,8 @@ class Application:
 
         self.splash = QSplashScreen(pixmap, Qt.WindowType.WindowStaysOnTopHint)
         self.splash.show()
+        self.splash.raise_()
+        self.splash.activateWindow() 
         self.app.processEvents()
 
     def _init_configuration(self, config_path: str):
