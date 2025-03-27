@@ -12,9 +12,7 @@ class TelegramNotifier:
     Handles sending notifications with images to Telegram using the Telegram Bot API.
     """
     def __init__(self, api_token: str, chat_id: str):
-        """
-        Initialize the Telegram notifier.
-        """
+        """Initialize the Telegram notifier."""
         self.api_token = api_token
         self.chat_id = chat_id
         self.base_url = f"https://api.telegram.org/bot{api_token}"
@@ -26,7 +24,6 @@ class TelegramNotifier:
         logging.basicConfig(level=logging.INFO)
         self.logger = logging.getLogger("TelegramNotifier")
 
-        # Validate settings on initialization
         if self.enabled:
             self._validate_settings()
 
@@ -82,7 +79,6 @@ class TelegramNotifier:
                     data = {"chat_id": self.chat_id, "caption": message}
                     response = requests.post(url, files=files, data=data, timeout=10)
 
-                # Clean up temp file
                 self._remove_temp_file(temp_image_path)
 
             else:
