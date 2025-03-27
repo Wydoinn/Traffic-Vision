@@ -4,6 +4,7 @@ import time
 import json
 import torch
 import cv2
+import subprocess
 from typing import Dict
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout,
                             QHBoxLayout, QLabel, QWidget, QMessageBox,
@@ -622,7 +623,6 @@ class ZoneManagerGUI(QMainWindow):
         """Updates video and heatmap display labels with processed frames."""
         video_pixmap = self.convert_cv_frame_to_pixmap(annotated_frame)
         heatmap_pixmap = self.convert_cv_frame_to_pixmap(heatmap_frame)
-        # Scale pixmaps to fit the available space while respecting aspect ratio
         aspect_ratio_mode = self.get_aspect_ratio_mode()
         video_container_size = self.video_label.size()
         heatmap_container_size = self.heatmap_label.size()
@@ -669,12 +669,15 @@ class ZoneManagerGUI(QMainWindow):
         if self.is_inferencing:
             self.stop_inference()
 
-        # Get the command that was used to start the program
-        import sys
-        import os
-        import subprocess
+        # Stop data collection if active
+        if hasattr(self, 'data_collector') and self.data_collector:
+            self.data_collector.stop_collection()
 
-        # Use Python executable to restart the application
+        # Close any open resources
+        if hasattr(self, 'zone_manager') and self.zone_manager:
+            self.zone_manager = None
+
+        # Get the command that was used to start the program
         python = sys.executable
         script = os.path.abspath(sys.argv[0])
         args = sys.argv[1:]
