@@ -2,15 +2,13 @@
 Traffic Vision: AI-Powered Traffic Monitoring System and Signal Optimization
 Main application entry point with initialization and error handling.
 """
-import os
 import sys
-import argparse
 from pathlib import Path
 import signal
 import faulthandler
-from typing import List
 
 from PyQt6.QtWidgets import QApplication, QSplashScreen, QMessageBox
+from PyQt6.QtGui import QFont, QPainter, QColor, QLinearGradient
 from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtCore import Qt, QTimer
 
@@ -21,7 +19,7 @@ faulthandler.enable()
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 # Import our modules
-from version import get_version_string, get_version_info
+from version import get_version_info
 from logger import info, error, exception
 from config_manager import ConfigManager
 from utils.error_handler import show_error_dialog
@@ -29,9 +27,7 @@ from utils.health_monitor import HealthMonitor
 from main import ZoneManagerGUI
 
 # Application metadata
-APP_NAME = "Traffic Vision"
-APP_ORGANIZATION = "Unkown"
-APP_DOMAIN = "github.com/Wydoinn/Traffic-Vision"
+APP_DISPLAY_NAME = "Traffic Vision"
 
 # Constants
 CONFIG_FILENAME = "configs/settings.json"
@@ -39,58 +35,34 @@ DEFAULT_LOG_LEVEL = "INFO"
 
 class Application:
     """Main application class that handles initialization and lifecycle."""
-    def __init__(self, args: List[str]):
-        self.args = self._parse_arguments(args)
+    def __init__(self):
         self.app = None
         self.main_window = None
         self.config_manager = None
         self.health_monitor = None
         self.splash = None
 
-    def _parse_arguments(self, args: List[str]) -> argparse.Namespace:
-        """Parse command line arguments."""
-        parser = argparse.ArgumentParser(description=f"{APP_NAME} - Traffic Management System")
-        parser.add_argument("--version", action="store_true", help="Show version information and exit")
-        parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose output")
-        parser.add_argument("--config", default=CONFIG_FILENAME, help="Path to configuration file")
-        parser.add_argument("--log-level", choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-                          default=DEFAULT_LOG_LEVEL, help="Set logging level")
-
-        return parser.parse_args(args)
-
     def run(self) -> int:
         """Run the application and return exit code."""
-        # Show version and exit if requested
-        if self.args.version:
-            print(get_version_string(detailed=True))
-            return 0
-
         try:
             # Initialize Qt Application
             self.app = QApplication([])
-            self.app.setApplicationName(APP_NAME)
-            self.app.setOrganizationName(APP_ORGANIZATION)
-            self.app.setOrganizationDomain(APP_DOMAIN)
+            self.app.setApplicationName(APP_DISPLAY_NAME)
             self.app.setWindowIcon(QIcon("static/icons/traffic-light.png"))
 
             # Show splash screen
             self._show_splash()
 
             # Initialize configuration
-            config_path = self.args.config
+            config_path = CONFIG_FILENAME
             self._init_configuration(config_path)
 
-            # Setup signal handlers for clean shutdown
             self._setup_signal_handlers()
-
-            # Initialize health monitoring
             self._init_health_monitoring()
-
-            # Create and show the main window
             self._create_main_window()
 
             # Hide splash screen and show main window after a short delay
-            QTimer.singleShot(1500, self._finish_startup)
+            QTimer.singleShot(2500, self._finish_startup)
 
             # Start the Qt event loop
             return self.app.exec()
@@ -105,46 +77,44 @@ class Application:
 
     def _show_splash(self):
         """Show a splash screen while the app loads."""
-        splash_path = os.path.join(os.path.dirname(__file__), "static/images/splash.png")
+        # Create a larger splash screen to accommodate the full title
+        pixmap = QPixmap(750, 450)
 
-        # Check if splash image exists, otherwise use a simple splash
-        if os.path.exists(splash_path):
-            pixmap = QPixmap(splash_path)
-        else:
-            # Create a simple splash screen with version info
-            from PyQt6.QtGui import QFont, QPainter, QColor, QLinearGradient
-            pixmap = QPixmap(600, 400)
+        # Create gradient background with black colors
+        gradient = QLinearGradient(0, 0, 0, 450)
+        gradient.setColorAt(0.0, QColor(0, 0, 0))
+        gradient.setColorAt(1.0, QColor(40, 40, 40))
 
-            # Create gradient background
-            gradient = QLinearGradient(0, 0, 0, 400)
-            gradient.setColorAt(0.0, QColor(40, 40, 80))
-            gradient.setColorAt(1.0, QColor(30, 30, 60))
+        painter = QPainter(pixmap)
+        painter.fillRect(0, 0, 750, 450, gradient)
 
-            painter = QPainter(pixmap)
-            painter.fillRect(0, 0, 600, 400, gradient)
+        # Draw main application name
+        title_font = QFont("Arial", 32, QFont.Weight.Bold)
+        painter.setFont(title_font)
+        painter.setPen(Qt.GlobalColor.white)
+        painter.drawText(30, 80, APP_DISPLAY_NAME)
 
-            # Draw application name
-            title_font = QFont("Arial", 36, QFont.Weight.Bold)
-            painter.setFont(title_font)
-            painter.setPen(Qt.GlobalColor.white)
-            painter.drawText(30, 80, APP_NAME)
+        # Draw subtitle
+        subtitle_font = QFont("Arial", 16)
+        painter.setFont(subtitle_font)
+        painter.drawText(30, 120, "AI-Powered Traffic Monitoring System and Signal Optimization")
 
-            # Draw version info
-            version_font = QFont("Arial", 14)
-            painter.setFont(version_font)
-            painter.drawText(30, 120, f"Version {get_version_info()['version']}")
+        # Draw version info
+        version_font = QFont("Arial", 14)
+        painter.setFont(version_font)
+        painter.drawText(30, 160, f"Version {get_version_info()['version']}")
 
-            # Draw loading message
-            status_font = QFont("Arial", 12)
-            painter.setFont(status_font)
-            painter.drawText(30, 360, "Initializing application...")
+        # Draw loading message
+        status_font = QFont("Arial", 12)
+        painter.setFont(status_font)
+        painter.drawText(30, 410, "Initializing application...")
 
-            painter.end()
+        painter.end()
 
         self.splash = QSplashScreen(pixmap, Qt.WindowType.WindowStaysOnTopHint)
         self.splash.show()
         self.splash.raise_()
-        self.splash.activateWindow() 
+        self.splash.activateWindow()
         self.app.processEvents()
 
     def _init_configuration(self, config_path: str):
@@ -229,7 +199,7 @@ class Application:
         self.main_window.show()
 
         # Log startup complete
-        info(f"{APP_NAME} started successfully")
+        info(f"{APP_DISPLAY_NAME} started successfully")
 
     def _cleanup_resources(self):
         """Clean up all resources during shutdown."""
@@ -255,7 +225,7 @@ class Application:
 def main():
     """Application entry point."""
     try:
-        app = Application(sys.argv[1:])
+        app = Application()
         sys.exit(app.run())
     except Exception as e:
         print(f"Fatal error: {e}")
