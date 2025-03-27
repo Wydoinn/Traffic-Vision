@@ -133,7 +133,6 @@ class TrafficDataCollector:
             return
 
         try:
-            # Get available data from zone manager
             self._collect_vehicle_counts()
             self._collect_pedestrian_counts()
             self._collect_vehicle_speeds()
