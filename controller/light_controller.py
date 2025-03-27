@@ -117,11 +117,9 @@ class TrafficLightController:
         self.last_pedestrian_data = {}
         self.pedestrian_phase_complete = {}
 
-        # Track when adaptive mode was changed
         self.adaptive_mode_changed = False
         self.last_adaptive_mode = True
 
-        # Emergency and accident handling
         self.emergency_active = {}
         self.emergency_vehicle_zone = {}
         self.emergency_start_time = {}
@@ -129,7 +127,6 @@ class TrafficLightController:
         self.accident_detected = False
         self.accident_zones = set()
 
-        # Load configuration if provided
         if config_file and os.path.exists(config_file):
             self.load_configuration(config_file)
 
@@ -403,7 +400,6 @@ class TrafficLightController:
         if next_light_id not in self.traffic_lights:
             return self.traffic_lights[next_light_id].config.min_green_time
 
-        # Get associated zone for this light
         zone_id = self.traffic_lights[next_light_id].config.zone_id
 
         # If no traffic data for this zone, use default timing
