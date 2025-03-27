@@ -1,62 +1,9 @@
 import sys
 import traceback
-from functools import wraps
-from typing import Callable, Optional, Type, Union, List, Any
+from typing import Optional
 
 from PyQt6.QtWidgets import QMessageBox, QApplication
 from logger import logger
-
-class ApplicationError(Exception):
-    """Base class for application-specific errors."""
-    def __init__(self, message: str, details: str = None):
-        self.message = message
-        self.details = details
-        super().__init__(message)
-
-class ModelError(ApplicationError):
-    """Error related to model loading or inference."""
-    pass
-
-class FileOperationError(ApplicationError):
-    """Error related to file operations."""
-    pass
-
-class ConfigurationError(ApplicationError):
-    """Error related to configuration settings."""
-    pass
-
-class NetworkError(ApplicationError):
-    """Error related to network operations."""
-    pass
-
-def handle_exceptions(error_types: Union[Type[Exception], List[Type[Exception]]] = Exception,
-                     show_dialog: bool = True,
-                     log_exception: bool = True,
-                     reraise: bool = False,
-                     default_return: Any = None) -> Callable:
-    """Decorator to handle exceptions in a standardized way."""
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except error_types as e:
-                if log_exception:
-                    logger.exception(f"Error in {func.__name__}: {str(e)}")
-
-                if show_dialog:
-                    show_error_dialog(
-                        title=f"Error in {func.__name__}",
-                        message=str(e),
-                        details=traceback.format_exc() if not isinstance(e, ApplicationError) else e.details
-                    )
-
-                if reraise:
-                    raise
-
-                return default_return
-        return wrapper
-    return decorator
 
 def show_error_dialog(title: str, message: str, details: Optional[str] = None):
     """Shows an error dialog to the user."""
