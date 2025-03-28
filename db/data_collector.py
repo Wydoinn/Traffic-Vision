@@ -4,8 +4,10 @@ import numpy as np
 from typing import Dict, List, Any, Optional
 from queue import Queue
 import cv2
+import traceback
 
 from db.database import TrafficDatabase
+from logger import logger
 
 
 class TrafficDataCollector:
@@ -68,9 +70,8 @@ class TrafficDataCollector:
                 self.data_queue.task_done()
 
             except Exception as e:
-                print(f"Error processing data queue: {e}")
-                import traceback
-                traceback.print_exc()
+                logger.error(f"Error processing data queue: {e}")
+                logger.error(traceback.format_exc())
                 time.sleep(1)
 
     def set_zone_manager(self, zone_manager):
@@ -80,13 +81,13 @@ class TrafficDataCollector:
     def start_collection(self, video_path: str = None, notes: str = None):
         """Start collecting traffic data."""
         if self.is_collecting:
-            print("Data collection is already running")
+            logger.info("Data collection is already running")
             return False
 
         # Start a new database session
         self.current_session_id = self.database.start_new_session(video_path, notes)
         if self.current_session_id < 0:
-            print("Failed to start database session")
+            logger.error("Failed to start database session")
             return False
 
         self.is_collecting = True
@@ -94,7 +95,7 @@ class TrafficDataCollector:
         self.collection_thread.daemon = True
         self.collection_thread.start()
 
-        print(f"Started traffic data collection (Session ID: {self.current_session_id})")
+        logger.info(f"Started traffic data collection (Session ID: {self.current_session_id})")
         return True
 
     def stop_collection(self):
@@ -111,7 +112,7 @@ class TrafficDataCollector:
             self.database.end_session(self.current_session_id)
             session_id = self.current_session_id
             self.current_session_id = None
-            print(f"Stopped traffic data collection (Session ID: {session_id})")
+            logger.info(f"Stopped traffic data collection (Session ID: {session_id})")
 
         return True
 
@@ -140,9 +141,8 @@ class TrafficDataCollector:
             self._collect_events()
             self._collect_heatmap_data()
         except Exception as e:
-            print(f"Error collecting traffic data: {e}")
-            import traceback
-            traceback.print_exc()
+            logger.error(f"Error collecting traffic data: {e}")
+            logger.error(traceback.format_exc())
 
     def _collect_vehicle_counts(self):
         """Collect and store vehicle counts by zone."""
@@ -154,7 +154,7 @@ class TrafficDataCollector:
             if zone_vehicle_counts:
                 self.data_queue.put(("vehicle_counts", zone_vehicle_counts))
         except Exception as e:
-            print(f"Error collecting vehicle counts: {e}")
+            logger.error(f"Error collecting vehicle counts: {e}")
 
     def _collect_pedestrian_counts(self):
         """Collect and store pedestrian counts by zone."""
@@ -166,7 +166,7 @@ class TrafficDataCollector:
             if zone_pedestrian_counts:
                 self.data_queue.put(("pedestrian_counts", zone_pedestrian_counts))
         except Exception as e:
-            print(f"Error collecting pedestrian counts: {e}")
+            logger.error(f"Error collecting pedestrian counts: {e}")
 
     def _collect_vehicle_speeds(self):
         """Collect and store vehicle speed data."""
@@ -208,7 +208,7 @@ class TrafficDataCollector:
                 if speeds_data:
                     self.data_queue.put(("vehicle_speeds", speeds_data))
         except Exception as e:
-            print(f"Error collecting vehicle speeds: {e}")
+            logger.error(f"Error collecting vehicle speeds: {e}")
 
     def _collect_traffic_light_states(self):
         """Collect and store traffic light states."""
@@ -235,7 +235,7 @@ class TrafficDataCollector:
                                 ("traffic_light_mode_change", f"Traffic light mode changed to {mode_str}")
                             ))
         except Exception as e:
-            print(f"Error collecting traffic light states: {e}")
+            logger.error(f"Error collecting traffic light states: {e}")
 
     def _collect_events(self):
         """Collect and store emergency and accident events."""
@@ -258,7 +258,7 @@ class TrafficDataCollector:
             if self.zone_manager.is_accident_detected():
                 self.data_queue.put(("event", ("accident", "Accident detected")))
         except Exception as e:
-            print(f"Error collecting events: {e}")
+            logger.error(f"Error collecting events: {e}")
 
     def _collect_heatmap_data(self):
         """Collect and store heatmap data for traffic density analysis."""
@@ -288,7 +288,7 @@ class TrafficDataCollector:
                     # Record zone heatmap data
                     self.data_queue.put(("heatmap", (zone_name, avg_intensity, max_intensity)))
         except Exception as e:
-            print(f"Error collecting heatmap data: {e}")
+            logger.error(f"Error collecting heatmap data: {e}")
 
     def get_session_stats(self, session_id: Optional[int] = None) -> Dict[str, Any]:
         """Get statistics for current or specified session."""
