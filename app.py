@@ -228,7 +228,7 @@ def main():
         app = Application()
         sys.exit(app.run())
     except Exception as e:
-        print(f"Fatal error: {e}")
+        exception(f"Fatal error: {e}")
         sys.exit(1)
 
 
