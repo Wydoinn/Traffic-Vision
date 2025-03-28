@@ -8,6 +8,7 @@ from collections import defaultdict
 
 from utils.constants import *
 from utils.notifier import TelegramNotifier
+from logger import logger
 
 class ZoneManager:
     """
@@ -86,7 +87,7 @@ class ZoneManager:
                 return fps if fps > 0 else 30.0
             return 30.0
         except Exception as e:
-            print(f"Error getting FPS: {e}")
+            logger.error(f"Error getting FPS: {e}")
             return 30.0
 
     def infer_frame_dimensions_from_video(self):
@@ -109,7 +110,7 @@ class ZoneManager:
         """
         cap = cv2.VideoCapture(self.video_path)
         if not cap.isOpened():
-            print("Error opening video stream")
+            logger.error("Error opening video stream")
             callback(False, zone_type)
             return
 
@@ -117,7 +118,7 @@ class ZoneManager:
         cap.release()
 
         if not ret:
-            print("Failed to capture frame")
+            logger.error("Failed to capture frame")
             callback(False, zone_type)
             return
 
@@ -133,7 +134,7 @@ class ZoneManager:
             current_zone_name = f"{zone_name_prefix} {i}"
             polygon = self.create_single_polygon(resized_frame, current_zone_name, window_name)
             if polygon is None:
-                print(f"Zone creation cancelled for {current_zone_name}")
+                logger.warning(f"Zone creation cancelled for {current_zone_name}")
                 cv2.destroyAllWindows()
                 callback(False, zone_type)
                 return
@@ -177,7 +178,7 @@ class ZoneManager:
                 if len(points) >= 3:
                     return np.array(points)
                 else:
-                    print("At least 3 points required")
+                    logger.warning("At least 3 points required")
 
             elif key == 27: # Esc key
                 return None
@@ -278,7 +279,7 @@ class ZoneManager:
 
         if success:
             self.last_accident_notification_time = time.time()
-            print(f"Accident notification sent at {time.strftime('%H:%M:%S')}")
+            logger.info(f"Accident notification sent at {time.strftime('%H:%M:%S')}")
 
     def _determine_accident_location(self):
         """Determine the location of the accident based on active zones."""
@@ -464,7 +465,7 @@ class ZoneManager:
     def get_common_inference_params(self) -> Dict:
         """Returns common inference parameters from settings."""
         if not self.inference_settings:
-            print("Warning: inference_settings is None. Using defaults.")
+            logger.warning("inference_settings is None. Using defaults.")
             return {
                 'imgsz': DEFAULT_IMG_SIZE,
                 'half': DEFAULT_HALF_PRECISION,
@@ -508,7 +509,7 @@ class ZoneManager:
                 **common_params
             )[0]
         except Exception as e:
-            print(f"Error during detection with {model_type}: {str(e)}")
+            logger.error(f"Error during detection with {model_type}: {str(e)}")
             import traceback
             traceback.print_exc()
             return None
@@ -750,13 +751,13 @@ class ZoneManager:
                     }
             return True
         except FileNotFoundError:
-            print(f"Error: Zone configuration file not found: {file_path}")
+            logger.error(f"Zone configuration file not found: {file_path}")
             return False
         except json.JSONDecodeError as e:
-            print(f"Error decoding zone configuration file: {file_path}. Error: {e}")
+            logger.error(f"Error decoding zone configuration file: {file_path}. Error: {e}")
             return False
         except Exception as e:
-            print(f"Error loading zones from {file_path}: {e}")
+            logger.error(f"Error loading zones from {file_path}: {e}")
             return False
 
     def update_counts(self, detections: sv.Detections):
