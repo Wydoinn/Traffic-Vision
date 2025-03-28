@@ -173,22 +173,24 @@ The **Monitoring** tab displays:
 
 ```
 📂 Traffic-Vision
- ┣ 📁 configs          # Configuration files  
- ┣ 📁 controller       # Traffic light control logic  
- ┣ 📁 data             # Traffic data and zone configurations  
- ┣ 📁 db               # SQLite database interaction  
- ┣ 📁 models           # YOLOv8 models  
- ┣ 📁 static           # UI assets and styling  
- ┣ 📁 ui               # User interface components  
- ┣ 📁 utils            # Utility functions  
- ┣ 📄 app.py           # Application initialization  
- ┣ 📄 config_manager.py # Configuration handling  
- ┣ 📄 inference.py     # Video processing and inference  
- ┣ 📄 logger.py        # Application logging  
- ┣ 📄 main.py          # Main UI window  
- ┣ 📄 manager.py       # Zone management & analysis  
- ┣ 📄 version.py       # Version tracking  
- ┣ 📄 visualizer.py    # Streamlit visualization  
+ ┣ 📁 configs              # Configuration files  
+ ┣ 📁 controller           # Traffic light control logic  
+ ┣ 📁 data                 # Traffic data 
+ ┣ 📁 db                   # SQLite database interaction
+ ┣ 📁 hardware_simulation  # SQLite database interaction
+ ┣ 📁 models               # Training results
+ ┣ 📁 static               # UI assets and styling  
+ ┣ 📁 ui                   # User interface components  
+ ┣ 📁 utils                # Utility functions
+ ┣ 📁 visualizations       # Trained model visualization 
+ ┣ 📄 app.py               # Application initialization  
+ ┣ 📄 config_manager.py    # Configuration handling  
+ ┣ 📄 inference.py         # Video processing and inference  
+ ┣ 📄 logger.py            # Application logging  
+ ┣ 📄 main.py              # Main UI window  
+ ┣ 📄 manager.py           # Zone management & analysis  
+ ┣ 📄 version.py           # Version tracking  
+ ┣ 📄 visualizer.py        # Streamlit visualization  
  ```
 
 
