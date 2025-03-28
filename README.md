@@ -170,7 +170,6 @@ Models can be used in multiple formats:
 
 ### Display Settings
 - Aspect ratio mode
-- Frame rendering options
 
 ### Notification Settings
 - Telegram API token
