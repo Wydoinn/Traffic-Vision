@@ -4,6 +4,8 @@ from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass
 import json
 import os
+from logger import logger
+import cv2
 
 class TrafficLightState(Enum):
     """Represents the possible states of a traffic light."""
@@ -538,11 +540,11 @@ class TrafficLightController:
                 try:
                     self.create_intersection(intersection_id, light_ids)
                 except ValueError as e:
-                    print(f"Error creating intersection {intersection_id}: {e}")
+                    logger.error(f"Error creating intersection {intersection_id}: {e}")
 
             return True
         except Exception as e:
-            print(f"Error loading traffic light configuration: {e}")
+            logger.error(f"Error loading traffic light configuration: {e}")
             return False
 
     def get_intersections_info(self):
@@ -626,3 +628,31 @@ class TrafficLightController:
                                color, 2, cv2.LINE_AA)
 
         return frame
+
+class TrafficLightPositionSelector:
+    """
+    Class for interactively selecting traffic light positions on the video frame.
+    Uses the same interactive approach as zone creation.
+    """
+    def __init__(self, video_path, frame_width, frame_height):
+        self.video_path = video_path
+        self.frame_width = frame_width
+        self.frame_height = frame_height
+        self.selected_position = None
+
+    def select_position(self, light_name: str) -> tuple:
+        """Interactively select a position on the video frame."""
+        cap = cv2.VideoCapture(self.video_path)
+        if not cap.isOpened():
+            logger.error("Error opening video stream")
+            return None
+
+        ret, frame = cap.read()
+        cap.release()
+
+        if not ret:
+            logger.error("Failed to capture frame")
+            return None
+
+        # Additional code for position selection can be added here
+        return self.selected_position
