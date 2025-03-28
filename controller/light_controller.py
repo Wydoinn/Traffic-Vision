@@ -548,33 +548,39 @@ class TrafficLightController:
     def get_intersections_info(self):
         """Returns information about all intersections for display."""
         result = {}
+
+        # Common system state flags used for all intersections
+        common_state = {
+            'is_adaptive_mode': self.adaptive_mode,
+            'adaptive_mode_changed': self.adaptive_mode_changed,
+            'is_accident_mode': self.accident_detected
+        }
+
         for intersection_id, light_ids in self.intersections.items():
             active_light_id = self.active_phase.get(intersection_id)
-            lights_info = []
-            is_pedestrian_phase = self.pedestrian_phase_active.get(intersection_id, False)
-            is_emergency_active = self.emergency_active.get(intersection_id, False)
-            is_accident_mode = self.accident_detected
 
+            # Intersection-specific states
+            intersection_state = {
+                'is_pedestrian_phase': self.pedestrian_phase_active.get(intersection_id, False),
+                'is_emergency_active': self.emergency_active.get(intersection_id, False),
+                'active_phase': active_light_id,
+                'lights': []
+            }
+
+            # Add light information
             for light_id in light_ids:
                 light = self.traffic_lights[light_id]
-                lights_info.append({
+                intersection_state['lights'].append({
                     'id': light_id,
                     'name': light.config.name,
                     'state': light.state.name,
                     'is_active': light_id == active_light_id,
                     'remaining': int(light.time_remaining),
-                    'is_pedestrian_phase': is_pedestrian_phase
+                    'is_pedestrian_phase': intersection_state['is_pedestrian_phase']
                 })
 
-            result[intersection_id] = {
-                'lights': lights_info,
-                'active_phase': active_light_id,
-                'is_pedestrian_phase': is_pedestrian_phase,
-                'is_emergency_active': is_emergency_active,
-                'is_accident_mode': is_accident_mode,
-                'is_adaptive_mode': self.adaptive_mode,
-                'adaptive_mode_changed': self.adaptive_mode_changed
-            }
+            # Combine common and intersection-specific state
+            result[intersection_id] = {**intersection_state, **common_state}
 
         return result
 
