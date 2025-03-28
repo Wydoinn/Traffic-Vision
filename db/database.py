@@ -3,6 +3,7 @@ import threading
 import os
 from datetime import datetime, timezone
 from typing import Dict, List, Any
+from logger import logger
 
 
 class TrafficDatabase:
@@ -25,9 +26,9 @@ class TrafficDatabase:
         if db_dir and not os.path.exists(db_dir):
             try:
                 os.makedirs(db_dir)
-                print(f"Created directory: {db_dir}")
+                logger.info(f"Created directory: {db_dir}")
             except OSError as e:
-                print(f"Error creating directory {db_dir}: {e}")
+                logger.error(f"Error creating directory {db_dir}: {e}")
                 raise
 
     def connect(self):
@@ -42,7 +43,7 @@ class TrafficDatabase:
                 self.local.conn.row_factory = sqlite3.Row
                 self.local.cursor = self.local.conn.cursor()
         except sqlite3.Error as e:
-            print(f"Database connection error: {e}")
+            logger.error(f"Database connection error: {e}")
             raise
 
     def ensure_connection(self):
@@ -172,7 +173,7 @@ class TrafficDatabase:
 
             self.local.conn.commit()
         except sqlite3.Error as e:
-            print(f"Error creating tables: {e}")
+            logger.error(f"Error creating tables: {e}")
             self.local.conn.rollback()
             raise
 
@@ -192,7 +193,7 @@ class TrafficDatabase:
             self.local.conn.commit()
             return self.local.cursor.lastrowid
         except sqlite3.Error as e:
-            print(f"Error starting session: {e}")
+            logger.error(f"Error starting session: {e}")
             self.local.conn.rollback()
             return -1
 
@@ -208,7 +209,7 @@ class TrafficDatabase:
             self.local.conn.commit()
             return True
         except sqlite3.Error as e:
-            print(f"Error ending session: {e}")
+            logger.error(f"Error ending session: {e}")
             self.local.conn.rollback()
             return False
 
@@ -240,7 +241,7 @@ class TrafficDatabase:
             self.local.conn.commit()
             return True
         except sqlite3.Error as e:
-            print(f"Error recording vehicle counts: {e}")
+            logger.error(f"Error recording vehicle counts: {e}")
             try:
                 self.local.conn.rollback()
             except:
@@ -260,7 +261,7 @@ class TrafficDatabase:
             self.local.conn.commit()
             return True
         except sqlite3.Error as e:
-            print(f"Error recording pedestrian counts: {e}")
+            logger.error(f"Error recording pedestrian counts: {e}")
             try:
                 self.local.conn.rollback()
             except:
@@ -296,7 +297,7 @@ class TrafficDatabase:
             self.local.conn.commit()
             return True
         except sqlite3.Error as e:
-            print(f"Error recording vehicle speeds: {e}")
+            logger.error(f"Error recording vehicle speeds: {e}")
             try:
                 self.local.conn.rollback()
             except:
@@ -330,7 +331,7 @@ class TrafficDatabase:
             self.local.conn.commit()
             return True
         except sqlite3.Error as e:
-            print(f"Error recording traffic light states: {e}")
+            logger.error(f"Error recording traffic light states: {e}")
             try:
                 self.local.conn.rollback()
             except:
@@ -349,7 +350,7 @@ class TrafficDatabase:
             self.local.conn.commit()
             return True
         except sqlite3.Error as e:
-            print(f"Error recording event: {e}")
+            logger.error(f"Error recording event: {e}")
             try:
                 self.local.conn.rollback()
             except:
@@ -372,7 +373,7 @@ class TrafficDatabase:
             self.local.conn.commit()
             return True
         except sqlite3.Error as e:
-            print(f"Error recording heatmap data: {e}")
+            logger.error(f"Error recording heatmap data: {e}")
             try:
                 self.local.conn.rollback()
             except:
@@ -403,7 +404,7 @@ class TrafficDatabase:
             )
             return [dict(row) for row in self.local.cursor.fetchall()]
         except sqlite3.Error as e:
-            print(f"Error fetching sessions: {e}")
+            logger.error(f"Error fetching sessions: {e}")
             return []
 
     def get_session_stats(self, session_id: int) -> Dict[str, Any]:
@@ -459,5 +460,5 @@ class TrafficDatabase:
 
             return stats
         except sqlite3.Error as e:
-            print(f"Error getting session stats: {e}")
+            logger.error(f"Error getting session stats: {e}")
             return stats
