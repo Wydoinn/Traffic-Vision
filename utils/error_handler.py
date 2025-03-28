@@ -25,9 +25,9 @@ def show_error_dialog(title: str, message: str, details: Optional[str] = None):
     except Exception as e:
         # Last resort if we can't even show the error dialog
         logger.critical(f"Failed to show error dialog: {e}")
-        print(f"ERROR: {title} - {message}")
+        logger.error(f"ERROR: {title} - {message}")
         if details:
-            print(f"DETAILS: {details}")
+            logger.error(f"DETAILS: {details}")
 
 def global_exception_handler(exctype, value, tb):
     """
@@ -45,7 +45,7 @@ def global_exception_handler(exctype, value, tb):
             details=error_details
         )
     else:
-        print(f"CRITICAL ERROR: {str(value)}\n{error_details}")
+        logger.critical(f"CRITICAL ERROR: {str(value)}\n{error_details}")
 
     # Call the original exception handler
     sys.__excepthook__(exctype, value, tb)
