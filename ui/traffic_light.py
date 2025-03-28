@@ -5,6 +5,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
                             QMessageBox, QFileDialog, QDialog, QFormLayout,
                             QLineEdit, QDialogButtonBox, QScrollArea, QCheckBox)
 from PyQt6.QtCore import Qt, QCoreApplication
+from logger import logger
 
 from controller.light_controller import TrafficLightController, TrafficLightConfig
 
@@ -24,14 +25,14 @@ class TrafficLightPositionSelector:
         """Interactively select a position on the video frame."""
         cap = cv2.VideoCapture(self.video_path)
         if not cap.isOpened():
-            print("Error opening video stream")
+            logger.error("Error opening video stream")
             return None
 
         ret, frame = cap.read()
         cap.release()
 
         if not ret:
-            print("Failed to capture frame")
+            logger.error("Failed to capture frame")
             return None
 
         resized_frame = cv2.resize(frame, (self.frame_width, self.frame_height))
