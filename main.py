@@ -21,6 +21,7 @@ from ui.settings import SettingsTab
 from ui.monitoring import MonitoringTab
 from ui.traffic_light import TrafficLightConfigTab
 from db.data_collector import TrafficDataCollector
+from logger import info, error, debug, warning, exception
 
 class ZoneManagerGUI(QMainWindow):
     """
@@ -146,9 +147,11 @@ class ZoneManagerGUI(QMainWindow):
                 return default_settings
         except json.JSONDecodeError as e:
             QMessageBox.critical(self, "Settings Error", f"Error decoding {SETTINGS_FILE}. Using default settings. Error: {e}")
+            error(f"Error decoding {SETTINGS_FILE}: {str(e)}")
             return default_settings
         except Exception as e:
             QMessageBox.critical(self, "Settings Error", f"Failed to load settings. Using default settings. Error: {e}")
+            exception(f"Failed to load settings: {str(e)}")
             return default_settings
 
     def get_default_settings(self) -> Dict:
@@ -215,7 +218,7 @@ class ZoneManagerGUI(QMainWindow):
         vid_stride = full_settings["inference_settings"].get("vid_stride", DEFAULT_VIDEO_STRIDE)
         if not isinstance(vid_stride, int) or vid_stride < 1:
             full_settings["inference_settings"]["vid_stride"] = DEFAULT_VIDEO_STRIDE
-            print(f"Warning: Invalid video stride value in settings, using default: {DEFAULT_VIDEO_STRIDE}")
+            warning(f"Invalid video stride value in settings, using default: {DEFAULT_VIDEO_STRIDE}")
 
         return full_settings
 
@@ -224,8 +227,10 @@ class ZoneManagerGUI(QMainWindow):
         try:
             with open(SETTINGS_FILE, 'w') as f:
                 json.dump(self.settings, f, indent=4)
+            info("Settings saved successfully")
         except Exception as e:
             QMessageBox.critical(self, "Settings Error", f"Failed to save settings. Error: {e}")
+            exception(f"Failed to save settings: {str(e)}")
 
     def save_settings_gui(self):
         """Saves settings from GUI elements to settings.json and reloads models."""
@@ -238,15 +243,15 @@ class ZoneManagerGUI(QMainWindow):
         # Determine the optimal device for inference
         if torch.cuda.is_available():
             inference_device = "cuda"
-            print(f"CUDA available: {torch.cuda.get_device_name(0)}")
+            info(f"CUDA available: {torch.cuda.get_device_name(0)}")
         elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
             inference_device = "mps"
-            print("Apple Silicon MPS acceleration available")
+            info("Apple Silicon MPS acceleration available")
         else:
             inference_device = "cpu"
-            print("Using CPU for inference")
+            info("Using CPU for inference")
 
-        print(f"Using device for inference: {inference_device}")
+        info(f"Using device for inference: {inference_device}")
 
         # Reset models first
         self.zone_model = None
@@ -280,8 +285,9 @@ class ZoneManagerGUI(QMainWindow):
             return model
         elif model_path:
             self.status_bar.showMessage(f"{model_type.capitalize()} model path not found: {model_path}", 3000)
+            warning(f"{model_type.capitalize()} model path not found: {model_path}")
         else:
-            print(f"{model_type.capitalize()} model path not set")
+            debug(f"{model_type.capitalize()} model path not set")
         return None
 
     def load_model(self, model_path, device):
@@ -302,9 +308,8 @@ class ZoneManagerGUI(QMainWindow):
             return model
         except Exception as e:
             QMessageBox.critical(self, "Model Load Error", f"Failed to load model {model_path}: {str(e)}")
-            print(f"Error loading model {model_path}: {str(e)}")
-            import traceback
-            traceback.print_exc()
+            error(f"Error loading model {model_path}: {str(e)}")
+            exception("Model loading exception")
             return None
 
     def browse_model_path(self, line_edit, setting_key):
@@ -334,6 +339,7 @@ class ZoneManagerGUI(QMainWindow):
             self.video_label.clear()
             self.heatmap_label.clear()
             self.status_bar.showMessage(f"Video selected: {filename}", 3000)
+            info(f"Video selected: {filename}")
 
             # Create Zone Manager with current settings
             self.zone_manager = ZoneManager(
@@ -354,6 +360,7 @@ class ZoneManagerGUI(QMainWindow):
 
         else:
             self.status_bar.showMessage("Video selection cancelled", 3000)
+            debug("Video selection cancelled by user")
 
     def start_create_vehicle_zones(self):
         """Starts vehicle zone creation, disabling UI elements."""
@@ -368,16 +375,19 @@ class ZoneManagerGUI(QMainWindow):
         if not self.video_path:
             QMessageBox.warning(self, "Error", "Please select a video first!")
             self.status_bar.showMessage("Error: No video selected for zone creation", 3000)
+            warning("Zone creation attempted without video selection")
             return
 
         num_zones = self.control_panel.vehicle_zone_spinbox.value() if zone_type == ZONE_TYPE_VEHICLE else self.control_panel.pedestrian_zone_spinbox.value()
         if num_zones == 0:
             QMessageBox.warning(self, "Error", f"You must create at least one {zone_type} zone!")
             self.status_bar.showMessage(f"Error: No {zone_type} zones specified for creation", 3000)
+            warning(f"Zone creation attempted with zero {zone_type} zones")
             return
 
         self.disable_zone_creation_buttons()
         self.status_bar.showMessage(f"Initializing {zone_type} zone creation...", 0)
+        info(f"Starting creation of {num_zones} {zone_type} zones")
 
         try:
             if self.zone_manager is None:
@@ -401,7 +411,7 @@ class ZoneManagerGUI(QMainWindow):
             error_message = f"Zone Manager Initialization Error: {str(e)}"
             QMessageBox.warning(self, "Error", error_message)
             self.status_bar.showMessage("Zone manager initialization failed!", 3000)
-            print(error_message)
+            exception(error_message)
 
     def disable_zone_creation_buttons(self):
         """Disables zone creation buttons."""
@@ -422,15 +432,18 @@ class ZoneManagerGUI(QMainWindow):
             self.control_panel.save_zones_btn.setEnabled(True)
             QMessageBox.information(self, "Success", f"{zone_type.capitalize()} Zones created successfully!")
             self.status_bar.showMessage(f"{zone_type.capitalize()} Zones created successfully!", 3000)
+            info(f"{zone_type.capitalize()} Zones created successfully!")
         else:
             QMessageBox.warning(self, "Error", f"Failed to create {zone_type} zones.")
             self.status_bar.showMessage(f"{zone_type.capitalize()} zone creation failed!", 3000)
+            warning(f"Failed to create {zone_type} zones.")
 
     def save_zones(self):
         """Saves zone configuration to a JSON file."""
         if not self.zone_manager or (not self.zone_manager.zones[ZONE_TYPE_VEHICLE] and not self.zone_manager.zones[ZONE_TYPE_PEDESTRIAN]):
             QMessageBox.warning(self, "Warning", "No zones to save. Create zones first.")
             self.status_bar.showMessage("Warning: No zones to save", 3000)
+            warning("Attempted to save zones but none were defined")
             return
         self.control_panel.save_zones_btn.setEnabled(False)
         self.control_panel.save_zones_btn.setEnabled(True)
@@ -443,16 +456,19 @@ class ZoneManagerGUI(QMainWindow):
                 file_path += ".json"
             try:
                 self.status_bar.showMessage("Saving zones...", 0)
+                info(f"Saving zones to {file_path}")
                 self.zone_manager.save_zones(file_path)
                 QMessageBox.information(self, "Success", f"Zones saved to {file_path}")
                 self.status_bar.showMessage(f"Zones saved to {file_path}", 3000)
+                info(f"Zones successfully saved to {file_path}")
             except Exception as e:
                 error_message = f"Failed to save zones: {str(e)}"
                 QMessageBox.critical(self, "Error", error_message)
                 self.status_bar.showMessage("Failed to save zones!", 3000)
-                print(error_message)
+                exception(error_message)
         else:
             self.status_bar.showMessage("Save zones cancelled", 3000)
+            debug("Zone saving cancelled by user")
 
     def load_zones(self):
         """Loads zone configuration from a JSON file."""
@@ -462,6 +478,7 @@ class ZoneManagerGUI(QMainWindow):
         if file_path:
             try:
                 self.status_bar.showMessage("Loading zones...", 0)
+                info(f"Loading zones from {file_path}")
                 self.zone_manager = ZoneManager(
                     frame_width=-1,
                     frame_height=-1,
@@ -478,16 +495,19 @@ class ZoneManagerGUI(QMainWindow):
                     self.control_panel.save_zones_btn.setEnabled(True)
                     QMessageBox.information(self, "Success", f"Zones loaded from {file_path}")
                     self.status_bar.showMessage(f"Zones loaded from {file_path}", 3000)
+                    info(f"Zones successfully loaded from {file_path}")
                 else:
                     QMessageBox.warning(self, "Error", "Failed to load zones.")
                     self.status_bar.showMessage("Failed to load zones!", 3000)
+                    warning(f"Failed to load zones from {file_path}")
             except Exception as e:
                 error_message = f"Failed to load zones: {str(e)}"
                 QMessageBox.critical(self, "Error", error_message)
                 self.status_bar.showMessage("Error loading zones!", 3000)
-                print(error_message)
+                exception(error_message)
         else:
             self.status_bar.showMessage("Load zones cancelled", 3000)
+            debug("Zone loading cancelled by user")
 
     def toggle_inference(self):
         """Starts or stops real-time inference."""
@@ -501,10 +521,12 @@ class ZoneManagerGUI(QMainWindow):
         if not self.video_path:
             QMessageBox.warning(self, "Error", "Please select a video first!")
             self.status_bar.showMessage("Error: No video selected for inference", 3000)
+            warning("Inference attempted without video selection")
             return
         if not self.zone_manager or (not self.zone_manager.zones[ZONE_TYPE_VEHICLE] and not self.zone_manager.zones[ZONE_TYPE_PEDESTRIAN]):
             QMessageBox.warning(self, "Error", "Please create or load zones first!")
             self.status_bar.showMessage("Error: No zones defined for inference", 3000)
+            warning("Inference attempted without zones defined")
             return
 
         # Always make sure we have an updated inference thread
@@ -521,6 +543,7 @@ class ZoneManagerGUI(QMainWindow):
         self.is_inferencing = True
         self.control_panel.start_inference_btn.setText("Stop Inference")
         self.status_bar.showMessage("Inference started", 0)
+        info(f"Starting inference on {self.video_path}")
 
         # Ensure zone manager has latest settings before starting inference
         self.zone_manager.inference_settings = self.settings["inference_settings"]
@@ -548,6 +571,7 @@ class ZoneManagerGUI(QMainWindow):
         if self.data_collector and not self.zone_manager.is_data_collection_active():
             self.zone_manager.start_data_collection(self.video_path, "Auto-started with inference")
             self.status_bar.showMessage("Data collection started automatically", 3000)
+            info("Data collection started automatically")
 
         # Configure Telegram notifications if enabled
         telegram_settings = self.settings.get("telegram_settings", {})
@@ -556,6 +580,7 @@ class ZoneManagerGUI(QMainWindow):
             chat_id = telegram_settings.get(TELEGRAM_CHAT_ID_KEY, "")
             self.zone_manager.set_telegram_notifier(api_token, chat_id, enabled=True)
             self.status_bar.showMessage("Telegram notifications enabled", 3000)
+            info("Telegram notifications enabled")
         else:
             # Disable notifications if not enabled
             self.zone_manager.set_telegram_notifier("", "", enabled=False)
@@ -572,6 +597,7 @@ class ZoneManagerGUI(QMainWindow):
             self.zone_manager.reset_heatmap()
             self.zone_manager.reset_trackers()
         self.status_bar.showMessage("Inference stopping...", 0)
+        info("Stopping inference")
         if self.inference_thread:
             self.inference_thread.stop_inference()
             self.inference_thread.wait()
@@ -580,8 +606,10 @@ class ZoneManagerGUI(QMainWindow):
         if self.zone_manager and self.zone_manager.is_data_collection_active():
             self.zone_manager.stop_data_collection()
             self.status_bar.showMessage("Data collection stopped", 3000)
+            info("Data collection stopped")
 
         self.status_bar.showMessage("Inference stopped", 3000)
+        info("Inference stopped successfully")
 
     def update_displays_from_thread(self, annotated_frame, heatmap_frame, detection_data):
         """Updates video and heatmap display labels with processed frames, throttled."""
@@ -664,6 +692,7 @@ class ZoneManagerGUI(QMainWindow):
     def restart_application(self):
         """Restarts the application to apply settings changes."""
         self.status_bar.showMessage("Restarting application...", 1000)
+        info("Application restart requested")
 
         # Clean up resources
         if self.is_inferencing:
@@ -672,6 +701,7 @@ class ZoneManagerGUI(QMainWindow):
         # Stop data collection if active
         if hasattr(self, 'data_collector') and self.data_collector:
             self.data_collector.stop_collection()
+            info("Data collection stopped during application restart")
 
         # Close any open resources
         if hasattr(self, 'zone_manager') and self.zone_manager:
@@ -681,6 +711,7 @@ class ZoneManagerGUI(QMainWindow):
         python = sys.executable
         script = os.path.abspath(sys.argv[0])
         args = sys.argv[1:]
+        info(f"Restarting with: {python} {script} {' '.join(args)}")
 
         # Close the current instance
         self.close()
@@ -689,6 +720,7 @@ class ZoneManagerGUI(QMainWindow):
         subprocess.Popen([python, script] + args)
 
         # Exit the current instance
+        info("Exiting current instance for restart")
         sys.exit(0)
 
     def show_data_viewer(self):
@@ -699,6 +731,7 @@ class ZoneManagerGUI(QMainWindow):
 def main():
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("static/icons/traffic-light.png"))
+    info("Starting Traffic Vision main window")
     zone_manager_gui = ZoneManagerGUI()
     zone_manager_gui.show()
     sys.exit(app.exec())
