@@ -187,9 +187,8 @@ Traffic Vision automatically collects traffic data during inference, including:
 - Accident detection events
 - Traffic patterns over time
   
+Data is stored in an SQLite database located in the `data/traffic_data.db` file.
 
-## 🤝 **Contributing**
-Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
 
 ## 📜 **License**
 This project is licensed under the MIT License.
