@@ -13,6 +13,12 @@ Traffic-Vision integrates **computer vision**, **adaptive control systems**, and
 ✅ Automated Telegram notifications for incidents  
 
 
+## 🎥 Demo
+[App Demo](https://github.com/user-attachments/assets/6e258a8e-7cb9-44c4-9dd2-acda85220bdd)
+
+[Dashboard Demo](https://github.com/user-attachments/assets/62815b55-02ce-458d-aeff-9fa055c9a899)
+
+
 ## 🔥 **Key Features**
 
 ### 🚥 **Real-Time Traffic Analysis**
