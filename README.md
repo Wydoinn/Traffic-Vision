@@ -15,29 +15,9 @@ Traffic-Vision integrates **computer vision**, **adaptive control systems**, and
 
 ## 🎥 Demo
 
-<div align="center">
-  <table>
-    <tr>
-      <td align="center" width="50%">
-        <strong>App Demo</strong><br>
-        <a href="https://github.com/user-attachments/assets/6e258a8e-7cb9-44c4-9dd2-acda85220bdd">
-          <img src="https://github.com/user-attachments/assets/2b71c8cf-844a-4aea-b7f3-338ce51e18e0" alt="App Demo Thumbnail" width="100%">
-        </a>
-        <em>(Video may take a few seconds to load)</em>
-      </td>
-      <td align="center" width="50%">
-        <strong>Dashboard Demo</strong><br>
-        <a href="https://github.com/user-attachments/assets/62815b55-02ce-458d-aeff-9fa055c9a899">
-          <img src="https://github.com/user-attachments/assets/520f468d-87d3-4d84-b14c-5c42cb50f4a3" alt="Dashboard Demo Thumbnail" width="100%">
-        </a>
-        <em>(Video may take a few seconds to load)</em>
-      </td>
-    </tr>
-  </table>
-</div>
+[App Demo](https://github.com/user-attachments/assets/e5fd80bb-b5f0-428b-93ec-e5e8e28230e2)
 
-
-
+[Dashboard Demo](https://github.com/user-attachments/assets/3cf1f129-8403-46ea-a91d-51d52a36e0cf)
 
 
 ## 🔥 **Key Features**
