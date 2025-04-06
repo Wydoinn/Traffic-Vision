@@ -1,72 +1,72 @@
-# 🚦 **Traffic-Vision**  
+# **Traffic-Vision**  
 **AI-Powered Traffic Monitoring and Signal Optimization System**
 
 Traffic-Vision is an advanced AI solution designed to revolutionize urban traffic management. With real-time video analysis, dynamic traffic control, and automated emergency detection, it enhances road safety, optimizes traffic flow, and provides actionable insights through intuitive visualizations.
 
 
-## 🌟 **Overview**
+## **Overview**
 Traffic-Vision integrates **computer vision**, **adaptive control systems**, and **IoT technologies** to create a comprehensive traffic management platform. It offers:  
-✅ Real-time accident and emergency vehicle detection  
-✅ Adaptive traffic light control based on live conditions  
-✅ Heatmap-based congestion analysis  
-✅ Custom monitoring zones for precise vehicle and pedestrian tracking  
-✅ Automated Telegram notifications for incidents  
+- Real-time accident and emergency vehicle detection  
+- Adaptive traffic light control based on live conditions  
+- Heatmap-based congestion analysis  
+- Custom monitoring zones for precise vehicle and pedestrian tracking  
+- Automated Telegram notifications for incidents  
 
 
-## 🎥 Demo
+## Demo
 [App Demo](https://github.com/user-attachments/assets/f4f07a78-00b7-4b57-b1fe-d37b438e5565)
 
 [Dashboard Demo](https://github.com/user-attachments/assets/0a73d480-5c27-4696-8355-bfc90ba7772c)
 
 
-## 🔥 **Key Features**
+## **Key Features**
 
-### 🚥 **Real-Time Traffic Analysis**
+### **Real-Time Traffic Analysis**
 - Processes live video feeds to monitor traffic conditions.  
 - Detects and classifies vehicles (cars, buses, trucks, bicycles, motorcycles).  
 - Tracks pedestrians and estimates vehicle speed.  
 
-### 🚑 **Emergency Vehicle & Accident Detection**
+### **Emergency Vehicle & Accident Detection**
 - Specialized YOLOv8 models detect ambulances and fire trucks.  
 - Automatically identifies and alerts on traffic accidents.  
 
-### 📊 **Dynamic Traffic Control**
+### **Dynamic Traffic Control**
 - Adjusts traffic light states based on real-time congestion.  
 - Prioritizes emergency vehicles and accident-affected routes.  
 
-### 🌍 **Heatmap-Based Congestion Analysis**
+### **Heatmap-Based Congestion Analysis**
 - Generates visual heatmaps to display traffic density.  
 - Customizable parameters: color, intensity, decay rate.  
 
-### 🔔 **Automated Notifications**
+### **Automated Notifications**
 - Sends real-time alerts for accidents and emergencies via Telegram.  
 
-### 💾 **Data Collection & Storage**
+### **Data Collection & Storage**
 - Collects and stores traffic metrics in an SQLite database.  
 - Enables historical analysis and reporting.  
 
 
-## ⚙️ **Tech Stack**
+## **Tech Stack**
 
-### 💡 **Machine Learning**
+### **Machine Learning**
 - **YOLOv8m**: Object detection for vehicles, pedestrians, and incidents.  
 
-### 🛠️ **Backend**
+### **Backend**
 - **PyQt6**: Graphical user interface.  
 - **SQLite**: Database for storing traffic metrics.  
 - **Streamlit**: Data visualization and analytics dashboard.  
 
-### 🔌 **Hardware Simulation**
+### **Hardware Simulation**
 - **Arduino (C++)**: Real-time traffic light simulation.  
 
-### 📲 **Messaging**
+### **Messaging**
 - **Telegram Bot**: Automated accident notifications.  
 
-### 📊 **Visualization**
+### **Visualization**
 - Heatmaps, real-time dashboards, and detailed analytics.  
 
 
-## 🛠️ **System Architecture**
+## **System Architecture**
 ```mermaid
 graph TD
     A[GUI Interface] --> B[Zone Manager]
@@ -83,7 +83,7 @@ graph TD
 ```
 
 
-## 💻 Recommended Hardware
+## **Recommended Hardware**
 
 ### Processor Graphics
 - **NVIDIA GPU**
@@ -110,9 +110,9 @@ graph TD
 - Verify Python environment meets version requirements
   
 
-## ⚙️ **Installation & Setup**
+## **Installation & Setup**
 
-### 1️⃣ **Environment Setup**
+### **Environment Setup**
 ```bash
 # Clone the repository
 git clone https://github.com/Wydoinn/Traffic-Vision.git
@@ -123,7 +123,7 @@ pip install -r requirements.txt
 ```
 
 
-### 2️⃣ **Run the Application**
+### **Run the Application**
 ```bash
 # Start the Traffic Vision Application
 python app.py
@@ -133,9 +133,9 @@ streamlit run visualizer.py
 ```
 
 
-## 🚦 **Usage Guide**
+## **Usage Guide**
 
-### ✅ **Model Configuration**
+### **Model Configuration**
 1. Open the **Settings** tab.  
 2. Configure model paths:  
    - **Object Detection Model** (vehicles & pedestrians)  
@@ -143,7 +143,7 @@ streamlit run visualizer.py
    - **Accident Detection Model**  
 3. Adjust confidence thresholds and IoU settings.  
 
-### 🔍 **Creating Monitoring Zones**
+### **Creating Monitoring Zones**
 1. Select a video source with the **Select Video** button.  
 2. Define monitoring zones:  
    - Click **Create Vehicle Zones** → draw on the video frame.  
@@ -151,14 +151,14 @@ streamlit run visualizer.py
 3. Repeat for pedestrian zones.  
 4. Save zone configurations for future sessions.  
 
-### 🚀 **Running Inference**
+### **Running Inference**
 1. Click **Start Inference** after configuring zones.  
 2. View live video feed with annotations, including:  
    - Real-time vehicle and pedestrian counts.  
    - Dynamic heatmaps showing congestion.  
    - Emergency vehicle and accident alerts.  
 
-### 🚦 **Traffic Light Management**
+### **Traffic Light Management**
 1. Go to the **Traffic Lights** tab.  
 2. Configure traffic light positions and logic.  
 3. Toggle the display of simulated traffic lights.  
@@ -167,7 +167,7 @@ streamlit run visualizer.py
    - Emergency vehicle detection.  
    - Accident alerts.  
 
-### 📊 **Monitoring Dashboard**
+### **Monitoring Dashboard**
 The **Monitoring** tab displays:  
 - Real-time vehicle and pedestrian counts by zone.  
 - Emergency vehicle indicators.  
@@ -175,7 +175,7 @@ The **Monitoring** tab displays:
 - Traffic light status and transitions.  
 
 
-## 🗂️ **Project Structure**
+## **Project Structure**
 
 ```
 📂 Traffic-Vision
@@ -200,7 +200,7 @@ The **Monitoring** tab displays:
  ```
 
 
-## 🤖 **AI Models**
+## **AI Models**
 
 Traffic-Vision uses three YOLOv8m models:  
 
@@ -208,16 +208,16 @@ Traffic-Vision uses three YOLOv8m models:
 2. **Emergency Vehicle Model:** Identifies ambulances and fire trucks.  
 3. **Accident Detection Model:** Recognizes accidents and incidents.  
 
-✅ Supported formats:  
+Supported formats:  
 - **PyTorch (.pt)**  
 - **CoreML (.mlpackage)** → Optimized for Apple Silicon  
 - **ONNX (.onnx)**  
 - **TensorRT (.engine)**  
 
 
-## ⚙️ **Configuration Options**
+## **Configuration Options**
 
-### 🔧 **Inference Settings**
+### **Inference Settings**
 - **Confidence Threshold:** Detection confidence level.  
 - **IoU Threshold:** Intersection-over-union for bounding boxes.  
 - **Image Size:** Input image resolution.  
@@ -225,23 +225,23 @@ Traffic-Vision uses three YOLOv8m models:
 - **Max Detections:** Limit for detections per frame.  
 - **Video Stride:** Frame skipping for faster processing.  
 
-### 🌡️ **Heatmap Settings**
+### **Heatmap Settings**
 - **Kernel Sigma:** Smoothing factor.  
 - **Intensity Factor:** Heatmap brightness.  
 - **Opacity:** Transparency level.  
 - **Colormap:** Heatmap color scheme.  
 - **Decay Rate:** Gradual fading of heatmap over time.  
 
-### 🖥️ **Display Settings**
+### **Display Settings**
 - **Aspect Ratio Mode:** Maintain aspect ratio for video feeds.  
 
-### 📩 **Notification Settings**
+### **Notification Settings**
 - **Telegram API Token:** Bot authentication.  
 - **Chat ID:** Recipient ID for alerts.  
 - **Enable/Disable Notifications.**  
 
 
-## 💾 **Data Collection**
+## **Data Collection**
 
 Traffic-Vision automatically collects traffic data during inference, including:  
 - Vehicle counts by type and zone.  
@@ -249,15 +249,15 @@ Traffic-Vision automatically collects traffic data during inference, including:
 - Emergency vehicle and accident events.  
 - Traffic patterns over time.  
 
-✅ Data is stored in an SQLite database:  
+Data is stored in an SQLite database:  
 ```bash
 /data/traffic_data.db
 ```
 
 
-## 📜 **License**
+## **License**
 This project is licensed under the **MIT License**.  
 Feel free to use, modify, and distribute it.
 
 
-🚀 **Traffic-Vision** — Transforming traffic management with AI-powered efficiency.
+**Traffic-Vision** — Transforming traffic management with AI-powered efficiency.
