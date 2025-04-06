@@ -258,6 +258,3 @@ Data is stored in an SQLite database:
 ## **License**
 This project is licensed under the **MIT License**.  
 Feel free to use, modify, and distribute it.
-
-
-**Traffic-Vision** — Transforming traffic management with AI-powered efficiency.
