@@ -8,7 +8,7 @@ class InferenceThread(QThread):
     """
     Thread for running inference to avoid blocking the GUI.
     """
-    frame_processed_signal = pyqtSignal(object, object, object)
+    frame_processed_signal = pyqtSignal(object, object, object, float)
     status_message_signal = pyqtSignal(str)
 
     def __init__(self, zone_manager, video_path, inference_settings):
@@ -20,6 +20,8 @@ class InferenceThread(QThread):
         self.is_running = False
         self.fps_values = []
         self.last_frame_time = None
+        self.frame_count = 0
+        self.start_time = 0
 
     def start_inference(self):
         """Start the inference thread."""
@@ -37,6 +39,8 @@ class InferenceThread(QThread):
 
     def run(self):
         """Main thread execution function for processing video frames."""
+        self.is_running = True
+
         try:
             self.cap = cv2.VideoCapture(self.video_path)
             if not self.cap.isOpened():
@@ -57,10 +61,10 @@ class InferenceThread(QThread):
             # Get video stride with safe default
             vid_stride = max(1, self.inference_settings.get("vid_stride", 1))
 
-            frame_count = 0
+            frame_count_total = 0
             fps_update_interval = 1
             last_fps_update = time.time()
-            current_fps = 0
+            current_fps = 0.0
 
             logger.info(f"Inference started with vid_stride={vid_stride}")
 
@@ -72,13 +76,13 @@ class InferenceThread(QThread):
                     self.status_message_signal.emit("End of video reached")
                     break
 
-                frame_count += 1
+                frame_count_total += 1
 
                 # Process only every vid_stride frames
-                if (frame_count - 1) % vid_stride != 0:
+                if (frame_count_total - 1) % vid_stride != 0:
                     continue
 
-                start_time = time.time()
+                processing_start_time = time.time()
 
                 # Process frame and collect detection data
                 try:
@@ -99,27 +103,25 @@ class InferenceThread(QThread):
                         intersections = self.zone_manager.traffic_light_controller.get_intersections_info()
                         detection_data["intersections"] = intersections
 
-                    # Emit processed frame to main thread
-                    self.frame_processed_signal.emit(annotated_frame, heatmap_frame, detection_data)
+                    # Emit processed frame to main thread, passing the calculated current_fps
+                    self.frame_processed_signal.emit(annotated_frame, heatmap_frame, detection_data, current_fps)
 
                     # Calculate and update FPS stats
                     if self.last_frame_time is not None:
-                        frame_time = time.time() - start_time
-                        self.fps_values.append(1.0 / frame_time if frame_time > 0 else 0)
-                        # Keep only the last 30 frames for averaging
+                        frame_processing_time = time.time() - processing_start_time
+                        instant_fps = 1.0 / frame_processing_time if frame_processing_time > 0 else 0
+                        self.fps_values.append(instant_fps)
                         if len(self.fps_values) > 30:
                             self.fps_values.pop(0)
-                        current_fps = sum(self.fps_values) / len(self.fps_values)
+                        if self.fps_values:
+                            current_fps = sum(self.fps_values) / len(self.fps_values)
+                        else:
+                            current_fps = 0.0
 
-                    self.last_frame_time = start_time
-
-                    # Update FPS in status bar periodically
-                    if time.time() - last_fps_update > fps_update_interval:
-                        self.status_message_signal.emit(f"Processing at {current_fps:.1f} FPS")
-                        last_fps_update = time.time()
+                    self.last_frame_time = processing_start_time
 
                 except Exception as e:
-                    logger.error(f"Error processing frame {frame_count}: {e}")
+                    logger.error(f"Error processing frame {frame_count_total}: {e}")
                     continue
 
         except Exception as e:
