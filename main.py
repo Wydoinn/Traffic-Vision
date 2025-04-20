@@ -8,7 +8,7 @@ import subprocess
 from typing import Dict
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout,
                             QHBoxLayout, QLabel, QWidget, QMessageBox,
-                            QTabWidget, QFileDialog, QSizePolicy)
+                            QTabWidget, QFileDialog, QSizePolicy, QFrame)
 from PyQt6.QtGui import QImage, QPixmap, QIcon
 from PyQt6.QtCore import Qt
 
@@ -22,6 +22,7 @@ from ui.monitoring import MonitoringTab
 from ui.traffic_light import TrafficLightConfigTab
 from db.data_collector import TrafficDataCollector
 from logger import info, error, debug, warning, exception
+from utils.health_monitor import HealthMonitor
 
 class ZoneManagerGUI(QMainWindow):
     """
@@ -50,6 +51,22 @@ class ZoneManagerGUI(QMainWindow):
         self.status_bar = self.statusBar()
         self.status_bar.showMessage("Ready")
 
+        self.inference_status_label = QLabel(" Status: Idle ")
+        self.status_bar.addPermanentWidget(self.inference_status_label)
+
+        self.data_collection_status_label = QLabel(" DB: Idle ")
+        self.status_bar.addPermanentWidget(self.data_collection_status_label)
+
+        self.fps_label = QLabel(" FPS: 0.0 ")
+        self.status_bar.addPermanentWidget(self.fps_label)
+
+        self.health_status_indicator = QFrame()
+        self.health_status_indicator.setFixedSize(15, 15)
+        self.health_status_indicator.setToolTip("System Health Status (Green=OK, Red=Alert)")
+        self._update_health_status(False)
+        self.status_bar.addPermanentWidget(QLabel(" Health: "))
+        self.status_bar.addPermanentWidget(self.health_status_indicator)
+
         self.settings = self.load_settings()
         self.apply_settings_to_models()
         self.setup_ui()
@@ -61,6 +78,12 @@ class ZoneManagerGUI(QMainWindow):
         self.update_interval = 1.0 / 30.0
 
         self.inference_thread = None
+
+        self.health_monitor = HealthMonitor(check_interval=30.0)
+        self.health_monitor.set_alert_callback(self._health_alert_callback)
+        self.health_monitor.start_monitoring()
+        info("Health monitor started.")
+
 
     def setup_ui(self):
         """Sets up the user interface of the application."""
@@ -543,6 +566,7 @@ class ZoneManagerGUI(QMainWindow):
         self.is_inferencing = True
         self.control_panel.start_inference_btn.setText("Stop Inference")
         self.status_bar.showMessage("Inference started", 0)
+        self.inference_status_label.setText(" Status: Running ")
         info(f"Starting inference on {self.video_path}")
 
         # Ensure zone manager has latest settings before starting inference
@@ -571,7 +595,12 @@ class ZoneManagerGUI(QMainWindow):
         if self.data_collector and not self.zone_manager.is_data_collection_active():
             self.zone_manager.start_data_collection(self.video_path, "Auto-started with inference")
             self.status_bar.showMessage("Data collection started automatically", 3000)
+            self.data_collection_status_label.setText(" DB: Recording ")
             info("Data collection started automatically")
+        elif self.zone_manager and self.zone_manager.is_data_collection_active():
+            self.data_collection_status_label.setText(" DB: Recording ")
+        else:
+            self.data_collection_status_label.setText(" DB: Error ")
 
         # Configure Telegram notifications if enabled
         telegram_settings = self.settings.get("telegram_settings", {})
@@ -597,6 +626,7 @@ class ZoneManagerGUI(QMainWindow):
             self.zone_manager.reset_heatmap()
             self.zone_manager.reset_trackers()
         self.status_bar.showMessage("Inference stopping...", 0)
+        self.inference_status_label.setText(" Status: Stopping... ")
         info("Stopping inference")
         if self.inference_thread:
             self.inference_thread.stop_inference()
@@ -606,16 +636,24 @@ class ZoneManagerGUI(QMainWindow):
         if self.zone_manager and self.zone_manager.is_data_collection_active():
             self.zone_manager.stop_data_collection()
             self.status_bar.showMessage("Data collection stopped", 3000)
+            self.data_collection_status_label.setText(" DB: Stopped ")
             info("Data collection stopped")
+        else:
+            # If inference stops but collection wasn't active or failed to start
+            self.data_collection_status_label.setText(" DB: Idle ")
 
         self.status_bar.showMessage("Inference stopped", 3000)
+        self.inference_status_label.setText(" Status: Stopped ")
         info("Inference stopped successfully")
 
-    def update_displays_from_thread(self, annotated_frame, heatmap_frame, detection_data):
-        """Updates video and heatmap display labels with processed frames, throttled."""
+    def update_displays_from_thread(self, annotated_frame, heatmap_frame, detection_data, fps):
+        """Updates video and heatmap display labels with processed frames, throttled, and updates FPS."""
         current_time = time.time()
         if current_time - self.last_update_time >= self.update_interval:
             self.update_display_labels(annotated_frame, heatmap_frame)
+
+            # Update FPS label
+            self.fps_label.setText(f" FPS: {fps:.1f} ")
 
             # Update zone-specific counts and alerts in monitoring tab
             if self.monitoring_tab:
@@ -727,6 +765,44 @@ class ZoneManagerGUI(QMainWindow):
         """This functionality has been removed."""
         QMessageBox.information(self, "Information",
             "The data viewer has been removed. The data is still being collected in the SQLite database.")
+
+    def _update_health_status(self, alert_active: bool):
+        """Updates the visual indicator for health status."""
+        color = "#FF0000" if alert_active else "#00FF00" # Red for alert, Green for OK
+        self.health_status_indicator.setStyleSheet(f"""
+            QFrame {{
+                border: 1px solid gray;
+                border-radius: 7px;
+                background-color: {color};
+            }}
+        """)
+
+    def _health_alert_callback(self, title: str, data: dict):
+        """Callback triggered by HealthMonitor for alerts."""
+        self._update_health_status(True)
+        message = data.get("message", "System resource usage exceeding thresholds")
+        details = data.get("details", "")
+        self.status_bar.showMessage(f"Health Alert: {message}", 8000)
+        warning(f"Health Alert: {title} - {message} {details}")
+
+    def closeEvent(self, event):
+        """Handle window close event."""
+        info("Close event triggered. Cleaning up...")
+        # Stop health monitor
+        if hasattr(self, 'health_monitor') and self.health_monitor:
+            self.health_monitor.stop_monitoring()
+            info("Health monitor stopped.")
+
+        # Stop inference if running
+        if self.is_inferencing:
+            self.stop_inference()
+
+        # Stop data collection if active
+        if hasattr(self, 'data_collector') and self.data_collector:
+            self.data_collector.stop_collection()
+
+        info("Cleanup finished. Closing application.")
+        event.accept()
 
 def main():
     app = QApplication(sys.argv)
