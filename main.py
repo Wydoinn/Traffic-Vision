@@ -68,6 +68,7 @@ class ZoneManagerGUI(QMainWindow):
         self.status_bar.addPermanentWidget(self.health_status_indicator)
 
         self.settings = self.load_settings()
+        self.check_initial_configuration()
         self.apply_settings_to_models()
         self.setup_ui()
 
@@ -259,9 +260,32 @@ class ZoneManagerGUI(QMainWindow):
         """Saves settings from GUI elements to settings.json and reloads models."""
         self.settings_tab.save_settings_gui()
 
+    def check_initial_configuration(self):
+        """Checks if settings file and specified model files exist at startup."""
+        config_missing = False
+        settings_file_exists = os.path.exists(SETTINGS_FILE)
+
+        if not settings_file_exists:
+            config_missing = True
+            warning(f"{SETTINGS_FILE} not found.")
+        else:
+            # Check if specified model paths exist
+            model_paths = self.settings.get("model_paths", {})
+            for model_type, path in model_paths.items():
+                if path and not os.path.exists(path):
+                    config_missing = True
+                    warning(f"Configured model file not found: {path} (for {model_type})")
+                    # No need to check further models if one is missing
+                    break
+
+        if config_missing:
+            self.status_bar.showMessage("Configuration needed: Please review Settings tab.", 10000)
+            info("Initial configuration check failed: Settings file or model files missing.")
+
+
     def apply_settings_to_models(self):
         """Loads models based on paths from settings.json, supporting multiple formats."""
-        model_paths = self.settings["model_paths"]
+        model_paths = self.settings.get("model_paths", {})
 
         # Determine the optimal device for inference
         if torch.cuda.is_available():
