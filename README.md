@@ -188,7 +188,6 @@ The **Monitoring** tab displays:
  ┣ 📁 static               # UI assets and styling  
  ┣ 📁 ui                   # User interface components  
  ┣ 📁 utils                # Utility functions
- ┣ 📁 visualizations       # Trained model visualization 
  ┣ 📄 app.py               # Application initialization  
  ┣ 📄 config_manager.py    # Configuration handling  
  ┣ 📄 inference.py         # Video processing and inference  
