@@ -1,7 +1,7 @@
 # **Traffic-Vision**  
 **AI-Powered Traffic Monitoring and Signal Optimization System**
 
-Traffic-Vision is an advanced AI solution designed to revolutionize urban traffic management. With real-time video analysis, dynamic traffic control, and automated emergency detection, it enhances road safety, optimizes traffic flow, and provides actionable insights through intuitive visualizations.
+Traffic-Vision is an advanced AI solution designed to revolutionize urban traffic management. With real-time video analysis, dynamic traffic control, and automated emergency detection, it enhances road safety, optimizes traffic flow and provides actionable insights through intuitive visualizations.
 
 
 ## **Overview**
